@@ -14,6 +14,7 @@ CASES = [
         "payload": {
             "project_info": {
                 "title": "霓虹武士饮酒",
+                "input_mode": "素材与文本混合",
                 "output_purpose": "带文字导演故事板",
             },
             "story_request": {
@@ -53,10 +54,11 @@ CASES = [
         },
     },
     {
-        "name": "transition_clean_grid",
+        "name": "text_only_clean_grid",
         "payload": {
             "project_info": {
                 "title": "镜中恶魔",
+                "input_mode": "纯文本创作",
                 "output_purpose": "无文字分镜宫格图",
             },
             "story_request": {
@@ -65,22 +67,7 @@ CASES = [
                 "scene_description": "黑暗浴室，镜前低照度环境。",
                 "visual_goal": "强调前状态、触发点、中间态和稳定尾帧。",
             },
-            "provided_assets": [
-                {
-                    "asset_id": "girl_ref",
-                    "role_tag": "角色",
-                    "asset_url": "https://example.com/girl.png",
-                    "description": "女孩正面参考",
-                    "must_keep": "脸型, 发型, 服装",
-                },
-                {
-                    "asset_id": "bathroom_ref",
-                    "role_tag": "场景",
-                    "asset_url": "https://example.com/bathroom.png",
-                    "description": "黑暗浴室",
-                    "must_keep": "镜子的位置, 低照度环境",
-                },
-            ],
+            "provided_assets": [],
             "optional_parameters": {
                 "board_type_hint": "转场",
                 "aspect_ratio": "9:16 竖屏",

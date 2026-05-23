@@ -7,7 +7,7 @@ def render_asset_section(asset_lock_map: Dict[str, Any]) -> str:
     lines = ["## 素材锁定", ""]
     assets = asset_lock_map.get("assets", [])
     if not assets:
-        lines.append("- 本次未提供素材。素材与文本均为必填，请先上传参考图。")
+        lines.append("- 本次未提供素材，按纯文本创作处理。")
         return "\n".join(lines)
 
     for asset in assets:

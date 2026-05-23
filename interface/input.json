@@ -12,12 +12,24 @@
     "project_info": {
       "type": "object",
       "title": "项目信息",
-      "description": "选择最终分镜图的输出形态。标题、生图、语言与输入模式由系统自动处理。",
+      "description": "选择输入模式与输出形态。标题、生图与语言由系统自动处理。",
       "ui_component": "section",
       "required": [
+        "input_mode",
         "output_purpose"
       ],
       "properties": {
+        "input_mode": {
+          "type": "string",
+          "title": "输入模式",
+          "description": "素材与文本混合时需上传参考图；纯文本创作时可不上传素材，完全靠文字描述生成分镜。",
+          "enum": [
+            "素材与文本混合",
+            "纯文本创作"
+          ],
+          "default": "素材与文本混合",
+          "ui_component": "select"
+        },
         "output_purpose": {
           "type": "string",
           "title": "输出形态",
@@ -71,9 +83,9 @@
     "provided_assets": {
       "type": "array",
       "title": "素材列表",
-      "description": "必填。上传参考图并为每张图指定职责；与故事请求共同构成导演规划依据。至少上传 1 张。",
+      "description": "混合模式下必填，至少 1 张参考图并指定职责；纯文本模式下可留空。",
       "ui_component": "asset_uploader",
-      "minItems": 1,
+      "minItems": 0,
       "items": {
         "type": "object",
         "required": [

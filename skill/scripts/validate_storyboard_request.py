@@ -1,4 +1,4 @@
-from pipeline_common import dump_json, load_input, normalize_output_purpose
+from pipeline_common import dump_json, load_input, normalize_input_mode, normalize_output_purpose
 
 
 def validate_payload(input_data):
@@ -10,6 +10,10 @@ def validate_payload(input_data):
     blockers = []
     risk_points = []
 
+    input_mode = normalize_input_mode(project_info.get("input_mode")) or "mixed"
+
+    if not project_info.get("input_mode"):
+        missing.append("project_info.input_mode")
     if not normalize_output_purpose(project_info.get("output_purpose")):
         missing.append("project_info.output_purpose")
 
@@ -23,11 +27,13 @@ def validate_payload(input_data):
         missing.append("story_request.scene_description")
         blockers.append("缺少场景描述，无法建立空间关系。")
 
-    if not assets:
+    if input_mode in {"asset_driven", "mixed"} and not assets:
         missing.append("provided_assets")
-        blockers.append("缺少参考素材。本 skill 固定采用素材与文本混合模式，故事请求和素材列表都必填。")
+        blockers.append("当前为素材与文本混合模式，请至少上传 1 张参考图。")
 
-    if not story_request.get("visual_goal", "").strip():
+    if input_mode == "text_only" and not story_request.get("visual_goal", "").strip():
+        risk_points.append("纯文本模式未提供视觉目标，将更多依赖故事描述自动推断画面重点。")
+    elif not story_request.get("visual_goal", "").strip():
         risk_points.append("未提供视觉目标，系统将更多依赖故事描述与素材推断重点。")
 
     return {

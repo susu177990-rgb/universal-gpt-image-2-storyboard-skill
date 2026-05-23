@@ -2,6 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "title": "故事板输入表单",
+  "description": "填写项目信息、故事请求与参考素材，系统将完成素材锁定、导演式分镜规划，并输出可执行的分镜提示词与分镜图。",
   "required": [
     "project_info",
     "story_request",
@@ -11,6 +12,8 @@
     "project_info": {
       "type": "object",
       "title": "项目信息",
+      "description": "决定这次分镜的工作方式、输出形态与是否执行生图。",
+      "ui_component": "section",
       "required": [
         "input_mode",
         "output_purpose",
@@ -20,55 +23,59 @@
         "title": {
           "type": "string",
           "title": "项目标题",
-          "description": "可选。不填时由系统自动生成。"
+          "description": "可选。用于命名本次分镜方案；不填时系统会根据核心故事自动生成。",
+          "ui_component": "text"
         },
         "input_mode": {
           "type": "string",
           "title": "输入模式",
+          "description": "说明本次创作主要依赖素材、纯文本，还是两者混合。会影响是否必须上传参考图。",
           "enum": [
-            "asset_driven",
-            "text_only",
-            "mixed"
-          ],
-          "enumNames": [
             "主要依赖素材",
             "纯文本创作",
             "素材与文本混合"
-          ]
+          ],
+          "default": "素材与文本混合",
+          "ui_component": "select"
         },
         "output_purpose": {
           "type": "string",
           "title": "输出目的",
+          "description": "决定最终分镜图采用哪种呈现形态：给人审核的 6 区提案板，或给下游模型的纯净参考板。",
           "enum": [
-            "review_or_pitch",
-            "model_reference"
-          ],
-          "enumNames": [
             "给人审核 / 提案",
             "给模型参考"
-          ]
+          ],
+          "default": "给人审核 / 提案",
+          "ui_component": "select"
         },
         "generation_mode": {
           "type": "string",
           "title": "图片执行模式",
+          "description": "是否在输出分镜方案的同时执行生图。当前固定为直接生图。",
           "enum": [
-            "generate_image"
-          ],
-          "enumNames": [
             "直接执行生图"
-          ]
+          ],
+          "default": "直接执行生图",
+          "ui_component": "select"
         },
         "output_language": {
           "type": "string",
           "title": "输出语言",
-          "enum": ["zh-CN"],
-          "default": "zh-CN"
+          "description": "分镜方案、提示词与说明文字的输出语言。",
+          "enum": [
+            "简体中文"
+          ],
+          "default": "简体中文",
+          "ui_component": "select"
         }
       }
     },
     "story_request": {
       "type": "object",
       "title": "故事请求",
+      "description": "描述这一段镜头要发生什么、谁在做、发生在什么环境里。这是导演规划的核心依据。",
+      "ui_component": "section",
       "required": [
         "story_framework",
         "main_action",
@@ -78,55 +85,54 @@
         "story_framework": {
           "type": "string",
           "title": "核心故事",
-          "description": "用一句话描述你想让这一段发生什么。"
+          "description": "用一句话概括这一段要拍什么。例如：「武士在酒吧里拿起发光瓶子喝酒」。",
+          "ui_component": "textarea"
         },
         "main_action": {
           "type": "string",
           "title": "主动作",
-          "description": "明确写出谁或什么在做什么。"
+          "description": "明确写出谁或什么在做什么，便于拆分每格镜头的动作阶段。",
+          "ui_component": "textarea"
         },
         "scene_description": {
           "type": "string",
           "title": "场景描述",
-          "description": "描述环境、空间关系、时间或光线。"
+          "description": "描述环境、空间关系、时间、光线或氛围，用于建立镜头空间与连续性。",
+          "ui_component": "textarea"
         },
         "visual_goal": {
           "type": "string",
           "title": "视觉目标",
-          "description": "可选。说明你最在意的视觉结果，例如：强调压迫感、强调产品特写、强调空间建立。"
+          "description": "可选。说明你最在意的视觉结果，例如强调压迫感、产品特写、空间建立或角色情绪。纯文本模式建议填写。",
+          "ui_component": "textarea"
         }
       }
     },
     "provided_assets": {
       "type": "array",
       "title": "素材列表",
-      "description": "上传参考图，并明确每个素材在最终画面中的职责。若输入模式为纯文本创作，可为空数组。",
+      "description": "上传参考图，并为每张图指定职责。系统会据此生成素材锁定表，防止角色、服装、风格等串位继承。纯文本创作时可为空。",
       "ui_component": "asset_uploader",
       "minItems": 0,
       "items": {
         "type": "object",
-        "required": ["asset_id", "role_tag", "asset_url"],
+        "required": [
+          "asset_id",
+          "role_tag",
+          "asset_url"
+        ],
         "properties": {
           "asset_id": {
             "type": "string",
-            "title": "素材 ID"
+            "title": "素材 ID",
+            "description": "本组素材的唯一标识，便于在锁定表和提示词中引用。例如：face_ref、armor_ref。",
+            "ui_component": "text"
           },
           "role_tag": {
             "type": "string",
             "title": "素材角色",
+            "description": "这张参考图在最终画面里负责锁定什么，不要混用多种职责。",
             "enum": [
-              "Character",
-              "Scene",
-              "Prop",
-              "Product",
-              "Costume",
-              "Style",
-              "Lighting",
-              "Motion",
-              "PreviousFrame",
-              "Layout"
-            ],
-            "enumNames": [
               "角色",
               "场景",
               "道具",
@@ -137,27 +143,33 @@
               "运动",
               "上一帧",
               "布局"
-            ]
+            ],
+            "ui_component": "select"
           },
           "asset_url": {
             "type": "string",
             "title": "素材链接",
-            "format": "uri"
+            "description": "参考图的 URL 或上传后的文件地址。",
+            "format": "uri",
+            "ui_component": "image_uploader"
           },
           "description": {
             "type": "string",
             "title": "素材描述",
-            "description": "简短描述这张图里的关键特征。"
+            "description": "简短说明这张图里的关键特征，帮助系统理解素材内容。",
+            "ui_component": "textarea"
           },
           "must_keep": {
             "type": "string",
             "title": "必须继承",
-            "description": "例如：脸型、盔甲纹样、瓶子造型、室内布局。"
+            "description": "生成时必须保留的元素。例如：脸型、盔甲纹样、瓶子造型、室内布局。",
+            "ui_component": "textarea"
           },
           "must_avoid": {
             "type": "string",
             "title": "禁止继承",
-            "description": "例如：模特脸、路人、背景文字、风格图中的人物。"
+            "description": "生成时绝不能带走的元素。例如：模特脸、路人、背景文字、风格图中的人物。",
+            "ui_component": "textarea"
           }
         }
       }
@@ -165,51 +177,83 @@
     "optional_parameters": {
       "type": "object",
       "title": "可选参数",
+      "description": "对分镜类型、画幅、格数、机位等进行偏好设置；不填时系统会自动推断。",
+      "ui_component": "section",
       "properties": {
         "board_type_hint": {
           "type": "string",
           "title": "分镜类型偏好",
+          "description": "可选。指定更适合的分镜组织方式；留空则根据故事与素材自动选择。",
           "enum": [
-            "Action Progression",
-            "Spatial Establishing",
-            "Transition",
-            "Emotion Performance",
-            "Continuous Shot",
-            "Multi-Shot",
-            "Product Interaction"
-          ]
+            "动作推进",
+            "空间建立",
+            "转场",
+            "情绪表演",
+            "连续镜头",
+            "多机位",
+            "产品交互"
+          ],
+          "ui_component": "select"
         },
         "aspect_ratio": {
           "type": "string",
           "title": "画幅比例",
-          "enum": ["16:9", "9:16", "1:1", "4:3", "2.35:1"],
-          "default": "16:9"
+          "description": "最终分镜图或每格画面的宽高比偏好。",
+          "enum": [
+            "16:9 横屏",
+            "9:16 竖屏",
+            "1:1 方形",
+            "4:3 传统",
+            "2.35:1 电影宽银幕"
+          ],
+          "default": "16:9 横屏",
+          "ui_component": "select"
+        },
+        "image_quality": {
+          "type": "string",
+          "title": "输出画质",
+          "description": "最终分镜图的生成分辨率档位。1K 适合快速预览，2K 为默认平衡，4K 适合提案终稿与高细节审查。",
+          "enum": [
+            "1K 标准",
+            "2K 高清",
+            "4K 超清"
+          ],
+          "default": "2K 高清",
+          "ui_component": "select"
         },
         "panel_count_hint": {
           "type": "integer",
           "title": "镜头格数偏好",
+          "description": "希望分成几格展示。范围 1–12；不填时系统按分镜类型自动决定。",
           "minimum": 1,
-          "maximum": 12
+          "maximum": 12,
+          "ui_component": "number"
         },
         "duration_hint_seconds": {
           "type": "number",
           "title": "时长参考（秒）",
-          "minimum": 0
+          "description": "可选。这段分镜对应的大致视频时长，用于辅助节奏与格数规划。",
+          "minimum": 0,
+          "ui_component": "number"
         },
         "camera_movement_preference": {
           "type": "string",
           "title": "机位偏好",
-          "description": "例如：固定机位、推镜头、摇摄、环绕。"
+          "description": "可选。例如：固定机位、推镜头、摇摄、环绕、跟拍。",
+          "ui_component": "text"
         },
         "style_goal": {
           "type": "string",
           "title": "风格目标",
-          "description": "可选。描述希望的视觉媒介或风格方向。"
+          "description": "可选。用文字补充整体视觉方向，例如：赛博朋克霓虹、胶片纪实、低饱和广告片、水彩插画、3D 游戏 CG。与「风格」类参考图互补：有风格图时优先锁图，此处写文字偏好或补充图里未覆盖的媒介质感。",
+          "ui_component": "textarea"
         },
         "allow_minor_inference": {
           "type": "boolean",
           "title": "允许自动补全次要细节",
-          "default": true
+          "description": "当某些非关键视觉信息未填写时，是否允许系统自动补全。默认允许。",
+          "default": true,
+          "ui_component": "checkbox"
         }
       }
     }

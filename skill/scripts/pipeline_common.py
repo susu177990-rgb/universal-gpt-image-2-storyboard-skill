@@ -122,7 +122,114 @@ BOARD_TYPE_MAP = {
     "Continuous Shot": "continuous_shot_board",
     "Multi-Shot": "multi_shot_board",
     "Product Interaction": "product_interaction_board",
+    "动作推进": "action_progression_board",
+    "空间建立": "spatial_establishing_board",
+    "转场": "transition_board",
+    "情绪表演": "emotion_performance_board",
+    "连续镜头": "continuous_shot_board",
+    "多机位": "multi_shot_board",
+    "产品交互": "product_interaction_board",
 }
+
+INPUT_MODE_ALIASES = {
+    "asset_driven": "asset_driven",
+    "text_only": "text_only",
+    "mixed": "mixed",
+    "主要依赖素材": "asset_driven",
+    "纯文本创作": "text_only",
+    "素材与文本混合": "mixed",
+}
+
+OUTPUT_PURPOSE_ALIASES = {
+    "review_or_pitch": "review_or_pitch",
+    "model_reference": "model_reference",
+    "给人审核 / 提案": "review_or_pitch",
+    "给模型参考": "model_reference",
+}
+
+GENERATION_MODE_ALIASES = {
+    "generate_image": "generate_image",
+    "直接执行生图": "generate_image",
+}
+
+OUTPUT_LANGUAGE_ALIASES = {
+    "zh-CN": "zh-CN",
+    "简体中文": "zh-CN",
+}
+
+ASPECT_RATIO_ALIASES = {
+    "16:9": "16:9",
+    "9:16": "9:16",
+    "1:1": "1:1",
+    "4:3": "4:3",
+    "2.35:1": "2.35:1",
+    "16:9 横屏": "16:9",
+    "9:16 竖屏": "9:16",
+    "1:1 方形": "1:1",
+    "4:3 传统": "4:3",
+    "2.35:1 电影宽银幕": "2.35:1",
+}
+
+
+def normalize_input_mode(value: Optional[str]) -> Optional[str]:
+    if value is None:
+        return None
+    return INPUT_MODE_ALIASES.get(str(value).strip())
+
+
+def normalize_output_purpose(value: Optional[str]) -> Optional[str]:
+    if value is None:
+        return None
+    return OUTPUT_PURPOSE_ALIASES.get(str(value).strip())
+
+
+def normalize_generation_mode(value: Optional[str]) -> str:
+    if value is None:
+        return "generate_image"
+    return GENERATION_MODE_ALIASES.get(str(value).strip(), "generate_image")
+
+
+def normalize_output_language(value: Optional[str]) -> str:
+    if value is None:
+        return "zh-CN"
+    return OUTPUT_LANGUAGE_ALIASES.get(str(value).strip(), "zh-CN")
+
+
+def normalize_aspect_ratio(value: Optional[str]) -> str:
+    if value is None:
+        return "16:9"
+    cleaned = str(value).strip()
+    return ASPECT_RATIO_ALIASES.get(cleaned, cleaned if cleaned in ASPECT_RATIO_ALIASES.values() else "16:9")
+
+
+IMAGE_QUALITY_ALIASES = {
+    "1K": "1K",
+    "2K": "2K",
+    "4K": "4K",
+    "1k": "1K",
+    "2k": "2K",
+    "4k": "4K",
+    "1K 标准": "1K",
+    "2K 高清": "2K",
+    "4K 超清": "4K",
+    "1080p": "1K",
+    "1440p": "2K",
+    "2160p": "4K",
+}
+
+
+def normalize_image_quality(value: Optional[str]) -> str:
+    if value is None:
+        return "2K"
+    cleaned = str(value).strip()
+    return IMAGE_QUALITY_ALIASES.get(cleaned, cleaned if cleaned in {"1K", "2K", "4K"} else "2K")
+
+
+def normalize_board_type_hint(value: Optional[str]) -> Optional[str]:
+    if value is None:
+        return None
+    cleaned = str(value).strip()
+    return BOARD_TYPE_MAP.get(cleaned, cleaned)
 
 BOARD_KEYWORDS = {
     "action_progression_board": ["挥拳", "奔跑", "打斗", "动作", "追逐", "跳", "冲刺", "出击", "fight", "run"],
@@ -278,7 +385,9 @@ def choose_output_format(output_purpose: str) -> str:
 
 
 def choose_board_type(storyboard_request: Dict[str, Any]) -> str:
-    hint = storyboard_request.get("board_type_hint")
+    hint = normalize_board_type_hint(storyboard_request.get("board_type_hint"))
+    if hint in BOARD_TYPE_MAP.values():
+        return hint
     if hint in BOARD_TYPE_MAP:
         return BOARD_TYPE_MAP[hint]
 

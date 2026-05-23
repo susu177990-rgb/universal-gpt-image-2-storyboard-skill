@@ -22,7 +22,8 @@ def render_asset_section(asset_lock_map: Dict[str, Any]) -> str:
     return "\n".join(lines).rstrip()
 
 
-def render_plan_section(storyboard_plan: Dict[str, Any]) -> str:
+def render_plan_section(storyboard_plan: Dict[str, Any], storyboard_request: Dict[str, Any] | None = None) -> str:
+    storyboard_request = storyboard_request or {}
     lines = [
         "## 导演规划摘要",
         "",
@@ -31,13 +32,21 @@ def render_plan_section(storyboard_plan: Dict[str, Any]) -> str:
         f"- 输出形态：`{storyboard_plan.get('output_format')}`",
         f"- 格数：{storyboard_plan.get('panel_count')}",
         f"- 机位策略：{storyboard_plan.get('camera_strategy')}",
-        "",
-        "### 连续性规则",
-        markdown_bullet_list(storyboard_plan.get("continuity_rules", [])),
-        "",
-        "### 分镜网格规划",
-        "",
     ]
+    if storyboard_request.get("image_quality"):
+        lines.append(f"- 输出画质：{storyboard_request.get('image_quality')}")
+    if storyboard_request.get("style_goal"):
+        lines.append(f"- 风格目标：{storyboard_request.get('style_goal')}")
+    lines.extend(
+        [
+            "",
+            "### 连续性规则",
+            markdown_bullet_list(storyboard_plan.get("continuity_rules", [])),
+            "",
+            "### 分镜网格规划",
+            "",
+        ]
+    )
     for panel in storyboard_plan.get("panels", []):
         lines.extend(
             [
@@ -59,6 +68,8 @@ def render_prompt_body(storyboard_request: Dict[str, Any], asset_lock_map: Dict[
     output_format = storyboard_plan.get("output_format")
     title = storyboard_request.get("title") or "未命名故事板"
     aspect_ratio = storyboard_request.get("aspect_ratio", "16:9")
+    image_quality = storyboard_request.get("image_quality", "2K")
+    style_goal = storyboard_request.get("style_goal", "").strip()
     panels = storyboard_plan.get("panels", [])
     roles = asset_lock_map.get("assets", [])
 
@@ -74,6 +85,7 @@ def render_prompt_body(storyboard_request: Dict[str, Any], asset_lock_map: Dict[
         f"项目标题：{title}",
         f"输出形态：{output_format}",
         f"画幅比例：每个分镜格内部使用 {aspect_ratio}",
+        f"输出画质：{image_quality}",
         f"分镜类型：{storyboard_plan.get('board_type')}",
         f"格数：{storyboard_plan.get('panel_count')}",
     ]
@@ -105,6 +117,8 @@ def render_prompt_body(storyboard_request: Dict[str, Any], asset_lock_map: Dict[
     prompt_lines.extend(f"- {line}" for line in forbidden_inheritance)
     prompt_lines.append("连续性规则：")
     prompt_lines.extend(f"- {line}" for line in storyboard_plan.get("continuity_rules", []))
+    if style_goal:
+        prompt_lines.append(f"风格目标：{style_goal}")
     prompt_lines.append("分镜内容：")
     for panel in panels:
         prompt_lines.append(
@@ -133,7 +147,7 @@ def main() -> None:
             "",
             render_asset_section(asset_lock_map),
             "",
-            render_plan_section(storyboard_plan),
+            render_plan_section(storyboard_plan, storyboard_request),
             "",
             "## 最终渲染提示词",
             "",

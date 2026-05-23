@@ -116,6 +116,7 @@ def main() -> None:
             "scene_description": story_request.get("scene_description", ""),
             "visual_goal": story_request.get("visual_goal", ""),
             "aspect_ratio": optional_parameters.get("aspect_ratio", "16:9"),
+            "image_quality": optional_parameters.get("image_quality", "2K"),
             "board_type_hint": optional_parameters.get("board_type_hint"),
             "panel_count_hint": optional_parameters.get("panel_count_hint"),
             "duration_hint_seconds": optional_parameters.get("duration_hint_seconds"),

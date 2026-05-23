@@ -44,7 +44,7 @@ def main() -> None:
             "",
             render_asset_section(asset_lock_map),
             "",
-            render_plan_section(storyboard_plan),
+            render_plan_section(storyboard_plan, storyboard_request),
             "",
             "## 最终渲染提示词",
             "",

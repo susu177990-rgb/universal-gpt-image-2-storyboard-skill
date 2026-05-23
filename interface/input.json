@@ -5,8 +5,8 @@
   "description": "填写项目信息、故事请求与参考素材，系统将完成素材锁定、导演式分镜规划，并输出可执行的分镜提示词与分镜图。",
   "required": [
     "project_info",
-    "story_request",
-    "provided_assets"
+    "provided_assets",
+    "story_request"
   ],
   "properties": {
     "project_info": {
@@ -40,35 +40,6 @@
           ],
           "default": "带文字导演故事板",
           "ui_component": "select"
-        }
-      }
-    },
-    "story_request": {
-      "type": "object",
-      "title": "故事请求",
-      "description": "只需填写核心故事（含谁、做什么、发生什么）。场景、视觉重点等可选项未填时，系统会从参考图与导演规划自动推断。",
-      "ui_component": "section",
-      "required": [
-        "story_framework"
-      ],
-      "properties": {
-        "story_framework": {
-          "type": "string",
-          "title": "核心故事",
-          "description": "必填。用一句话写清这一段要拍什么，包含主体与动作，例如：「赛博朋克酒吧里，武士拿起发光瓶子喝酒」。",
-          "ui_component": "textarea"
-        },
-        "scene_description": {
-          "type": "string",
-          "title": "场景描述",
-          "description": "可选。不填时优先依据「场景」类参考图推断；若无场景图，由导演规划根据核心故事补全环境、空间与光向。",
-          "ui_component": "textarea"
-        },
-        "visual_goal": {
-          "type": "string",
-          "title": "视觉目标",
-          "description": "可选。不填时依据角色/产品等参考图与核心故事推断视觉重点，例如身份一致、产品可见、情绪可读。",
-          "ui_component": "textarea"
         }
       }
     },
@@ -135,6 +106,35 @@
             "description": "生成时绝不能带走的元素。例如：模特脸、路人、背景文字、风格图中的人物。",
             "ui_component": "textarea"
           }
+        }
+      }
+    },
+    "story_request": {
+      "type": "object",
+      "title": "故事请求",
+      "description": "只需填写核心故事（含谁、做什么、发生什么）。场景、视觉重点等可选项未填时，系统会从参考图与导演规划自动推断。",
+      "ui_component": "section",
+      "required": [
+        "story_framework"
+      ],
+      "properties": {
+        "story_framework": {
+          "type": "string",
+          "title": "核心故事",
+          "description": "必填。用一句话写清这一段要拍什么，包含主体与动作，例如：「赛博朋克酒吧里，武士拿起发光瓶子喝酒」。",
+          "ui_component": "textarea"
+        },
+        "scene_description": {
+          "type": "string",
+          "title": "场景描述",
+          "description": "可选。不填时优先依据「场景」类参考图推断；若无场景图，由导演规划根据核心故事补全环境、空间与光向。",
+          "ui_component": "textarea"
+        },
+        "visual_goal": {
+          "type": "string",
+          "title": "视觉目标",
+          "description": "可选。不填时依据角色/产品等参考图与核心故事推断视觉重点，例如身份一致、产品可见、情绪可读。",
+          "ui_component": "textarea"
         }
       }
     },

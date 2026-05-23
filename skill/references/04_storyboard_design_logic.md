@@ -44,6 +44,19 @@
 
 如果目标在两种完全不同的类型之间摇摆，必须补问，不能硬猜。
 
+## 第零步：补全故事字段（素材锁定后）
+
+在进入分镜类型选择前，必须先形成完整的叙事控制字段：
+
+| 字段 | 来源优先级 |
+|------|-----------|
+| `story_framework` | 用户必填 |
+| `main_action` | 用户兼容输入 > 等于 `story_framework` |
+| `scene_description` | 用户输入 > 场景参考图 > 导演推断 |
+| `visual_goal` | 用户输入 > 角色/产品等参考图 + 故事 > 导演推断 |
+
+Agent 执行时必须读取 `scripts/infer_story_fields.py` 的逻辑，或在脑中等价执行，并在 `storyboard_request.inferred_fields` 中标注推断来源。
+
 ## 第二步：建立素材锁定图
 
 根据 `references/03_asset_classification.md`，把所有素材映射为清晰职责。

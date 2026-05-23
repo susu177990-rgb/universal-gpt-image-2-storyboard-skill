@@ -3,17 +3,17 @@ import json
 import sys
 from typing import Any, Dict, List
 
+from classify_asset_roles import build_asset_lock_map
+from compress_user_brief import build_storyboard_request
+from infer_story_fields import enrich_storyboard_request
 from pipeline_common import (
     PANEL_TEMPLATES,
-    build_title,
     choose_board_type,
     choose_output_format,
     choose_panel_count,
     derive_subject_label,
     dump_json,
     load_input,
-    normalize_input_mode,
-    normalize_output_purpose,
     resolve_assets,
 )
 
@@ -104,33 +104,31 @@ def main() -> None:
     payload = load_input()
     storyboard_request = payload.get("storyboard_request")
     if not storyboard_request:
-        project_info = payload.get("project_info", {})
         story_request = payload.get("story_request", {})
         optional_parameters = payload.get("optional_parameters", {})
-        storyboard_request = {
-            "title": build_title(story_request.get("story_framework", ""), project_info.get("title")),
-            "input_mode": normalize_input_mode(project_info.get("input_mode")) or "mixed",
-            "output_purpose": normalize_output_purpose(project_info.get("output_purpose")) or "review_or_pitch",
-            "generation_mode": "generate_image",
-            "output_language": "zh-CN",
-            "story_framework": story_request.get("story_framework", ""),
-            "main_action": story_request.get("main_action", ""),
-            "scene_description": story_request.get("scene_description", ""),
-            "visual_goal": story_request.get("visual_goal", ""),
-            "aspect_ratio": optional_parameters.get("aspect_ratio", "16:9"),
-            "image_quality": optional_parameters.get("image_quality", "2K"),
-            "board_type_hint": optional_parameters.get("board_type_hint"),
-            "panel_count_hint": optional_parameters.get("panel_count_hint"),
-            "duration_hint_seconds": optional_parameters.get("duration_hint_seconds"),
-            "camera_movement_preference": optional_parameters.get("camera_movement_preference", ""),
-            "style_goal": optional_parameters.get("style_goal", ""),
-            "allow_minor_inference": optional_parameters.get("allow_minor_inference", True),
-        }
+        asset_lock_map = payload.get("asset_lock_map")
+        if not asset_lock_map:
+            asset_lock_map = build_asset_lock_map(resolve_assets(payload))
+        storyboard_request = enrich_storyboard_request(
+            build_storyboard_request(payload),
+            asset_lock_map,
+            story_request,
+        )
+        storyboard_request.update(
+            {
+                "aspect_ratio": optional_parameters.get("aspect_ratio", storyboard_request.get("aspect_ratio", "16:9")),
+                "image_quality": optional_parameters.get("image_quality", storyboard_request.get("image_quality", "2K")),
+                "board_type_hint": optional_parameters.get("board_type_hint", storyboard_request.get("board_type_hint")),
+                "panel_count_hint": optional_parameters.get("panel_count_hint"),
+                "duration_hint_seconds": optional_parameters.get("duration_hint_seconds"),
+                "camera_movement_preference": optional_parameters.get("camera_movement_preference", ""),
+                "style_goal": optional_parameters.get("style_goal", ""),
+                "allow_minor_inference": optional_parameters.get("allow_minor_inference", True),
+            }
+        )
 
     asset_lock_map = payload.get("asset_lock_map")
     if not asset_lock_map:
-        from classify_asset_roles import build_asset_lock_map  # local import for script use
-
         asset_lock_map = build_asset_lock_map(resolve_assets(payload))
 
     board_type = choose_board_type(storyboard_request)

@@ -46,36 +46,28 @@
     "story_request": {
       "type": "object",
       "title": "故事请求",
-      "description": "描述这一段镜头要发生什么、谁在做、发生在什么环境里。这是导演规划的核心依据。",
+      "description": "只需填写核心故事（含谁、做什么、发生什么）。场景、视觉重点等可选项未填时，系统会从参考图与导演规划自动推断。",
       "ui_component": "section",
       "required": [
-        "story_framework",
-        "main_action",
-        "scene_description"
+        "story_framework"
       ],
       "properties": {
         "story_framework": {
           "type": "string",
           "title": "核心故事",
-          "description": "用一句话概括这一段要拍什么。例如：「武士在酒吧里拿起发光瓶子喝酒」。",
-          "ui_component": "textarea"
-        },
-        "main_action": {
-          "type": "string",
-          "title": "主动作",
-          "description": "明确写出谁或什么在做什么，便于拆分每格镜头的动作阶段。",
+          "description": "必填。用一句话写清这一段要拍什么，包含主体与动作，例如：「赛博朋克酒吧里，武士拿起发光瓶子喝酒」。",
           "ui_component": "textarea"
         },
         "scene_description": {
           "type": "string",
           "title": "场景描述",
-          "description": "描述环境、空间关系、时间、光线或氛围，用于建立镜头空间与连续性。",
+          "description": "可选。不填时优先依据「场景」类参考图推断；若无场景图，由导演规划根据核心故事补全环境、空间与光向。",
           "ui_component": "textarea"
         },
         "visual_goal": {
           "type": "string",
           "title": "视觉目标",
-          "description": "可选。说明你最在意的视觉结果，例如强调压迫感、产品特写、空间建立或角色情绪。纯文本模式建议填写。",
+          "description": "可选。不填时依据角色/产品等参考图与核心故事推断视觉重点，例如身份一致、产品可见、情绪可读。",
           "ui_component": "textarea"
         }
       }

@@ -22,6 +22,28 @@ def render_asset_section(asset_lock_map: Dict[str, Any]) -> str:
     return "\n".join(lines).rstrip()
 
 
+def render_story_section(storyboard_request: Dict[str, Any]) -> str:
+    inferred = storyboard_request.get("inferred_fields", {})
+    lines = ["## 故事与推断字段", ""]
+
+    def mark(field: str) -> str:
+        meta = inferred.get(field, {})
+        return "（推断）" if meta.get("inferred") else "（用户填写）"
+
+    lines.extend(
+        [
+            f"- 核心故事：{storyboard_request.get('story_framework')}",
+            f"- 动作理解 {mark('main_action')}：{storyboard_request.get('main_action')}",
+            f"- 场景描述 {mark('scene_description')}：{storyboard_request.get('scene_description')}",
+            f"- 视觉目标 {mark('visual_goal')}：{storyboard_request.get('visual_goal')}",
+        ]
+    )
+    assumptions = storyboard_request.get("assumptions", [])
+    if assumptions:
+        lines.extend(["", "### 推断说明", markdown_bullet_list(assumptions)])
+    return "\n".join(lines)
+
+
 def render_plan_section(storyboard_plan: Dict[str, Any], storyboard_request: Dict[str, Any] | None = None) -> str:
     storyboard_request = storyboard_request or {}
     lines = [
@@ -83,6 +105,10 @@ def render_prompt_body(storyboard_request: Dict[str, Any], asset_lock_map: Dict[
 
     header = [
         f"项目标题：{title}",
+        f"核心故事：{storyboard_request.get('story_framework')}",
+        f"动作理解：{storyboard_request.get('main_action')}",
+        f"场景描述：{storyboard_request.get('scene_description')}",
+        f"视觉目标：{storyboard_request.get('visual_goal')}",
         f"输出形态：{output_format}",
         f"画幅比例：每个分镜格内部使用 {aspect_ratio}",
         f"输出画质：{image_quality}",
@@ -146,6 +172,8 @@ def main() -> None:
             f"- 图片执行：`{storyboard_request.get('generation_mode', 'generate_image')}`",
             "",
             render_asset_section(asset_lock_map),
+            "",
+            render_story_section(storyboard_request),
             "",
             render_plan_section(storyboard_plan, storyboard_request),
             "",

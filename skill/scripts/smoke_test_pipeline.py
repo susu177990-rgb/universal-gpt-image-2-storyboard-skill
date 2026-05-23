@@ -18,10 +18,7 @@ CASES = [
                 "output_purpose": "带文字导演故事板",
             },
             "story_request": {
-                "story_framework": "一个武士坐在酒吧里，拿起发光瓶子喝酒。",
-                "main_action": "武士拿起瓶子并饮用。",
-                "scene_description": "赛博朋克酒吧内部，霓虹反射在金属与木质台面上。",
-                "visual_goal": "强调角色身份、产品可见性和酒吧氛围。",
+                "story_framework": "一个武士坐在赛博朋克酒吧里，拿起发光瓶子喝酒。",
             },
             "provided_assets": [
                 {
@@ -63,9 +60,6 @@ CASES = [
             },
             "story_request": {
                 "story_framework": "女孩触摸镜子，镜中倒影逐步变成恶魔。",
-                "main_action": "女孩触发镜中变身。",
-                "scene_description": "黑暗浴室，镜前低照度环境。",
-                "visual_goal": "强调前状态、触发点、中间态和稳定尾帧。",
             },
             "provided_assets": [],
             "optional_parameters": {
@@ -93,6 +87,10 @@ def run_case(case):
     assert payload["generation_mode"] == "generate_image"
     assert payload["master_prompt_markdown"].startswith("# ")
     assert payload["storyboard_plan"]["panels"]
+    assert payload["storyboard_request"]["main_action"]
+    assert payload["storyboard_request"]["scene_description"]
+    assert payload["storyboard_request"]["visual_goal"]
+    assert "inferred_fields" in payload["storyboard_request"]
 
 
 def main():

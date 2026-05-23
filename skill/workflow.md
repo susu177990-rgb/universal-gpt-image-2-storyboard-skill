@@ -33,22 +33,28 @@
 
 必须确认：
 
-- 用户要拍什么
-- 谁或什么是主体
-- 发生在什么空间
-- 输出是给人看还是给模型吃
+- 用户要拍什么（核心故事，含主体与动作）
+- 输出形态（带文字导演故事板 / 无文字分镜宫格图）
+- 混合模式下是否提供了参考素材
+
+可推断、不要求用户单独填写：
+
+- 主动作：默认与核心故事一体
+- 场景描述：优先场景参考图，否则导演推断
+- 视觉目标：优先角色/产品等参考图 + 故事推断
 
 如果缺少关键输入：
 
 - 使用 `assets/output_contracts/compact_user_request_form.md`
 - 每次最多补问 1 到 2 项
 
-## 阶段 2：素材锁定
+## 阶段 2：素材锁定与字段推断
 
 目标：
 
-- 为每个素材分配唯一职责
-- 产出 `asset_lock_map`
+- 为每个素材分配唯一职责，产出 `asset_lock_map`
+- 在素材锁定完成后，补全 `main_action`、`scene_description`、`visual_goal`
+- 推断规则见 `scripts/infer_story_fields.py` 与 `references/02_input_requirements.md`
 
 最低要求：
 

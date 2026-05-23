@@ -2,9 +2,10 @@ from pipeline_common import dump_json, load_input, resolve_assets
 
 from classify_asset_roles import build_asset_lock_map
 from compress_user_brief import build_storyboard_request
+from infer_story_fields import enrich_storyboard_request
 from plan_storyboard import build_continuity_rules, build_panels, build_risk_controls, BOARD_REASONS, CAMERA_DEFAULTS
 from pipeline_common import choose_board_type, choose_output_format, choose_panel_count, derive_subject_label
-from render_storyboard_output import render_asset_section, render_plan_section, render_prompt_body
+from render_storyboard_output import render_asset_section, render_plan_section, render_prompt_body, render_story_section
 from validate_storyboard_request import validate_payload
 
 
@@ -15,6 +16,11 @@ def main() -> None:
     storyboard_request = build_storyboard_request(payload)
     resolved_assets = resolve_assets(payload)
     asset_lock_map = build_asset_lock_map(resolved_assets)
+    storyboard_request = enrich_storyboard_request(
+        storyboard_request,
+        asset_lock_map,
+        payload.get("story_request", {}),
+    )
 
     board_type = choose_board_type(storyboard_request)
     output_format = choose_output_format(storyboard_request.get("output_purpose", "review_or_pitch"))
@@ -43,6 +49,8 @@ def main() -> None:
             f"- 图片执行：`{storyboard_request.get('generation_mode', 'generate_image')}`",
             "",
             render_asset_section(asset_lock_map),
+            "",
+            render_story_section(storyboard_request),
             "",
             render_plan_section(storyboard_plan, storyboard_request),
             "",

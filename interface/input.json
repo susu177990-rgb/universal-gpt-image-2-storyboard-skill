@@ -12,18 +12,12 @@
     "project_info": {
       "type": "object",
       "title": "项目信息",
-      "description": "填写输出形态等项目信息。素材与文本均为必填，生图与中文输出由系统自动处理。",
+      "description": "选择最终分镜图的输出形态。标题、生图、语言与输入模式由系统自动处理。",
       "ui_component": "section",
       "required": [
         "output_purpose"
       ],
       "properties": {
-        "title": {
-          "type": "string",
-          "title": "项目标题",
-          "description": "可选。用于命名本次分镜方案；不填时系统会根据核心故事自动生成。",
-          "ui_component": "text"
-        },
         "output_purpose": {
           "type": "string",
           "title": "输出形态",

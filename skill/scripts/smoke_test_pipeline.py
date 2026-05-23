@@ -89,7 +89,7 @@ def run_case(case):
     assert payload["storyboard_plan"]["panels"]
     assert payload["storyboard_request"]["main_action"]
     assert payload["storyboard_request"]["scene_description"]
-    assert payload["storyboard_request"]["visual_goal"]
+    assert payload["storyboard_request"]["performance_focus"]
     assert "inferred_fields" in payload["storyboard_request"]
 
 

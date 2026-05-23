@@ -7,10 +7,17 @@
     "provided_assets",
     "story_request"
   ],
+  "propertyOrdering": [
+    "project_info",
+    "provided_assets",
+    "story_request",
+    "optional_parameters"
+  ],
   "properties": {
     "project_info": {
       "type": "object",
       "title": "项目信息",
+      "ui_order": 1,
       "ui_component": "section",
       "required": [
         "input_mode",
@@ -42,6 +49,8 @@
     "provided_assets": {
       "type": "array",
       "title": "素材列表",
+      "description": "混合模式下请至少上传 1 张参考图；纯文本模式下可留空。",
+      "ui_order": 2,
       "ui_component": "asset_uploader",
       "minItems": 0,
       "items": {
@@ -101,24 +110,37 @@
     "story_request": {
       "type": "object",
       "title": "故事请求",
+      "description": "填写这一段要拍什么；场景与表演细节可选，留空时系统会在素材锁定后自动推断。",
+      "ui_order": 3,
       "ui_component": "section",
       "required": [
         "story_framework"
+      ],
+      "propertyOrdering": [
+        "story_framework",
+        "scene_description",
+        "performance_focus"
       ],
       "properties": {
         "story_framework": {
           "type": "string",
           "title": "核心故事",
+          "description": "必填。用一句话写清这一段的主体、动作与剧情走向，例如「武士在赛博酒吧里拿起发光瓶饮酒」。",
+          "ui_order": 1,
           "ui_component": "textarea"
         },
         "scene_description": {
           "type": "string",
           "title": "场景描述",
+          "description": "可选。描述环境、空间、光照与时间感；留空则跟随场景参考图，无场景图时由导演规划推断。",
+          "ui_order": 2,
           "ui_component": "textarea"
         },
-        "visual_goal": {
+        "performance_focus": {
           "type": "string",
-          "title": "视觉目标",
+          "title": "表演重点",
+          "description": "可选。写这一段最想突出的情绪、肢体动作或交互表演；留空则结合角色/产品等参考图与核心故事自动推断。",
+          "ui_order": 3,
           "ui_component": "textarea"
         }
       }
@@ -126,6 +148,7 @@
     "optional_parameters": {
       "type": "object",
       "title": "可选参数",
+      "ui_order": 4,
       "ui_component": "section",
       "properties": {
         "board_type_hint": {
@@ -198,7 +221,24 @@
         "style_goal": {
           "type": "string",
           "title": "风格目标",
-          "ui_component": "textarea"
+          "description": "整体画面美学与媒介方向；选「自动推断」时由系统结合故事与素材决定。有风格参考图时，文字选项作为补充。",
+          "enum": [
+            "自动推断",
+            "电影写实",
+            "胶片纪实",
+            "赛博朋克霓虹",
+            "低饱和冷调",
+            "高饱和广告片",
+            "暖色复古",
+            "黑白胶片",
+            "黑白线稿模式",
+            "水彩插画",
+            "赛璐璐动画",
+            "3D 游戏 CG",
+            "纪录片手持"
+          ],
+          "default": "自动推断",
+          "ui_component": "select"
         },
         "allow_minor_inference": {
           "type": "boolean",

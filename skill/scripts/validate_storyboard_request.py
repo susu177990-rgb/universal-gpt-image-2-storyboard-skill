@@ -1,10 +1,10 @@
-from pipeline_common import dump_json, load_input, normalize_input_mode, normalize_output_purpose
+from pipeline_common import dump_json, load_input, normalize_input_mode, normalize_output_purpose, resolve_assets
 
 
 def validate_payload(input_data):
     project_info = input_data.get("project_info", {})
     story_request = input_data.get("story_request", {})
-    assets = input_data.get("provided_assets", [])
+    assets = resolve_assets(input_data)
 
     missing = []
     blockers = []

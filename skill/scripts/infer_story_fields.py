@@ -1,6 +1,7 @@
 from typing import Any, Dict, List, Tuple
 
 from classify_asset_roles import build_asset_lock_map
+from pipeline_common import resolve_performance_focus
 
 
 InferenceSource = str
@@ -57,7 +58,7 @@ def infer_scene_description(
     return "未提供场景信息，需由导演规划补全空间与光向。", True, "director_inference"
 
 
-def infer_visual_goal(
+def infer_performance_focus(
     story_framework: str,
     explicit: str,
     asset_lock_map: Dict[str, Any],
@@ -80,20 +81,20 @@ def infer_visual_goal(
             if must_keep:
                 identity_bits.append(f"锁定{must_keep}")
         if identity_bits:
-            goals.append(f"围绕角色参考保持身份一致（{'；'.join(identity_bits[:2])}）")
+            goals.append(f"围绕角色参考保持身份一致，并突出情绪表达与肢体表演（{'；'.join(identity_bits[:2])}）")
         else:
-            goals.append("强调角色身份一致与表演可读")
+            goals.append("强调角色身份一致、情绪表达与肢体表演可读")
 
     if role_summary.get("Product"):
-        goals.append("强调产品识别度、可见性与交互位置")
+        goals.append("强调产品展示动作、使用姿态与交互表演")
     if role_summary.get("Prop"):
-        goals.append("强调道具形态稳定与交互关系")
+        goals.append("强调道具持握、传递或使用等交互表演")
     if role_summary.get("Costume"):
-        goals.append("强调服装版型与纹样一致，不继承模特身份")
+        goals.append("强调服装在动作与姿态中的呈现，不继承模特身份")
     if role_summary.get("Style"):
-        goals.append("只提取风格色彩与质感，不继承风格图内容物")
+        goals.append("风格只影响表演氛围与画面质感，不继承风格图内容物")
     if role_summary.get("Scene") and not _scene_assets(asset_lock_map):
-        goals.append("结合场景素材保持空间与光向连续")
+        goals.append("结合场景素材保持空间走位与表演动线连续")
 
     cleaned_story = (story_framework or "").strip()
     if goals:
@@ -102,11 +103,11 @@ def infer_visual_goal(
 
     if cleaned_story:
         return (
-            f"未填写视觉目标，依据核心故事「{cleaned_story}」突出动作推进、表演可读与画面叙事重点。",
+            f"未填写表演重点，依据核心故事「{cleaned_story}」突出动作推进、情绪表达与镜头内表演节奏。",
             True,
             "director_inference",
         )
-    return "突出动作推进与画面叙事重点。", True, "director_inference"
+    return "突出动作推进、情绪表达与镜头内表演节奏。", True, "director_inference"
 
 
 def enrich_storyboard_request(
@@ -126,9 +127,10 @@ def enrich_storyboard_request(
         raw_story_request.get("scene_description", storyboard_request.get("scene_description", "")),
         asset_lock_map,
     )
-    visual_goal, visual_inferred, visual_source = infer_visual_goal(
+    explicit_performance_focus = resolve_performance_focus(raw_story_request, storyboard_request)
+    performance_focus, performance_inferred, performance_source = infer_performance_focus(
         story_framework,
-        raw_story_request.get("visual_goal", storyboard_request.get("visual_goal", "")),
+        explicit_performance_focus,
         asset_lock_map,
     )
 
@@ -140,24 +142,25 @@ def enrich_storyboard_request(
             assumptions.append("未填写场景描述，已依据场景参考图推断空间与光向。")
         else:
             assumptions.append("未填写场景描述且无场景参考图，已按导演规划推断环境。")
-    if visual_inferred:
-        if visual_source == "asset_roles":
-            assumptions.append("未填写视觉目标，已依据角色/产品等参考图与核心故事推断视觉重点。")
+    if performance_inferred:
+        if performance_source == "asset_roles":
+            assumptions.append("未填写表演重点，已依据角色/产品等参考图与核心故事推断表演方向。")
         else:
-            assumptions.append("未填写视觉目标，已依据核心故事推断视觉重点。")
+            assumptions.append("未填写表演重点，已依据核心故事推断表演方向。")
 
     enriched = {
         **storyboard_request,
         "main_action": main_action,
         "scene_description": scene_description,
-        "visual_goal": visual_goal,
+        "performance_focus": performance_focus,
         "inferred_fields": {
             "main_action": {"inferred": main_inferred, "source": main_source},
             "scene_description": {"inferred": scene_inferred, "source": scene_source},
-            "visual_goal": {"inferred": visual_inferred, "source": visual_source},
+            "performance_focus": {"inferred": performance_inferred, "source": performance_source},
         },
         "assumptions": assumptions,
     }
+    enriched.pop("visual_goal", None)
     return enriched
 
 

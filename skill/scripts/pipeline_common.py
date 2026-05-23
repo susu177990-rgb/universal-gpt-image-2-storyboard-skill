@@ -187,6 +187,30 @@ CAMERA_PREFERENCE_ALIASES = {
     "Locked Camera": "固定机位，保持稳定构图推进叙事。",
 }
 
+STYLE_GOAL_ALIASES = {
+    "自动推断": "",
+    "电影写实": "电影级写实摄影，自然光比与真实材质，避免过度 HDR 与塑料感。",
+    "胶片纪实": "胶片质感纪实风格，轻微颗粒，柔和对比，保留现场真实感。",
+    "赛博朋克霓虹": "赛博朋克霓虹美学，高对比、霓虹反射、湿面质感与都市夜光。",
+    "低饱和冷调": "低饱和冷灰调色，克制对比，偏冷静、疏离的电影感。",
+    "高饱和广告片": "高饱和商业广告片质感，清晰主体、强对比、干净利落的产品呈现。",
+    "暖色复古": "暖色复古胶片感，偏黄/琥珀色调，柔和高光与怀旧氛围。",
+    "黑白胶片": "黑白胶片美学，强调明暗层次、轮廓与构图，不含彩色信息。",
+    "黑白线稿模式": "黑白线稿分镜模式，仅保留清晰轮廓线与结构线，不含上色、阴影渲染或彩色信息，强调构图、动作与镜头可读性，类似手稿 storyboard sketch。",
+    "黑白线稿": "黑白线稿分镜模式，仅保留清晰轮廓线与结构线，不含上色、阴影渲染或彩色信息，强调构图、动作与镜头可读性，类似手稿 storyboard sketch。",
+    "水彩插画": "水彩插画媒介，留白笔触、柔和边缘、手绘纸质感。",
+    "赛璐璐动画": "赛璐璐二维动画风格，清晰线稿、平涂色块、经典动画读法。",
+    "3D 游戏 CG": "3D 游戏 CG 渲染，清晰材质、可控光照、偏数字美术资产感。",
+    "纪录片手持": "纪录片手持实拍风，自然光、轻微晃动、现场观察式构图。",
+    "cinematic realism": "电影级写实摄影，自然光比与真实材质，避免过度 HDR 与塑料感。",
+    "film documentary": "胶片质感纪实风格，轻微颗粒，柔和对比，保留现场真实感。",
+    "cyberpunk": "赛博朋克霓虹美学，高对比、霓虹反射、湿面质感与都市夜光。",
+    "watercolor": "水彩插画媒介，留白笔触、柔和边缘、手绘纸质感。",
+    "anime cel": "赛璐璐二维动画风格，清晰线稿、平涂色块、经典动画读法。",
+    "line art": "黑白线稿分镜模式，仅保留清晰轮廓线与结构线，不含上色、阴影渲染或彩色信息，强调构图、动作与镜头可读性，类似手稿 storyboard sketch。",
+    "storyboard sketch": "黑白线稿分镜模式，仅保留清晰轮廓线与结构线，不含上色、阴影渲染或彩色信息，强调构图、动作与镜头可读性，类似手稿 storyboard sketch。",
+}
+
 
 def normalize_input_mode(value: Optional[str]) -> Optional[str]:
     if value is None:
@@ -226,6 +250,19 @@ def normalize_camera_preference(value: Optional[str]) -> str:
     if not cleaned:
         return ""
     return CAMERA_PREFERENCE_ALIASES.get(cleaned, cleaned)
+
+
+def normalize_style_goal(value: Optional[str]) -> str:
+    if value is None:
+        return ""
+    cleaned = str(value).strip()
+    if not cleaned:
+        return ""
+    if cleaned in STYLE_GOAL_ALIASES:
+        return STYLE_GOAL_ALIASES[cleaned]
+    if cleaned in STYLE_GOAL_ALIASES.values():
+        return cleaned
+    return cleaned
 
 
 IMAGE_QUALITY_ALIASES = {
@@ -371,7 +408,11 @@ def resolve_assets(payload: Any) -> List[Dict[str, Any]]:
     if isinstance(payload, list):
         assets = payload
     elif isinstance(payload, dict):
-        assets = payload.get("provided_assets") or payload.get("assets") or []
+        raw = payload.get("provided_assets") or payload.get("assets") or []
+        if isinstance(raw, dict):
+            assets = raw.get("items") or raw.get("assets") or []
+        else:
+            assets = raw
     else:
         assets = []
 
@@ -393,6 +434,17 @@ def resolve_assets(payload: Any) -> List[Dict[str, Any]]:
             role = infer_role_from_text(text_blob)
         resolved.append({**asset, "resolved_role": role})
     return resolved
+
+
+def resolve_performance_focus(*sources: Any) -> str:
+    for source in sources:
+        if not isinstance(source, dict):
+            continue
+        for key in ("performance_focus", "visual_goal"):
+            value = source.get(key)
+            if isinstance(value, str) and value.strip():
+                return value.strip()
+    return ""
 
 
 def build_title(story_framework: str, explicit_title: Optional[str]) -> str:
@@ -422,6 +474,7 @@ def choose_board_type(storyboard_request: Dict[str, Any]) -> str:
             storyboard_request.get("story_framework", ""),
             storyboard_request.get("main_action", ""),
             storyboard_request.get("scene_description", ""),
+            storyboard_request.get("performance_focus", ""),
             storyboard_request.get("visual_goal", ""),
         ]
     ).lower()

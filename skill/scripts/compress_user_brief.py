@@ -8,6 +8,8 @@ from pipeline_common import (
     normalize_image_quality,
     normalize_input_mode,
     normalize_output_purpose,
+    normalize_style_goal,
+    resolve_performance_focus,
 )
 
 
@@ -27,6 +29,9 @@ def build_storyboard_request(payload):
     camera_pref = normalize_camera_preference(optional_parameters.get("camera_movement_preference"))
     if not camera_pref:
         assumptions.append("未指定机位偏好，将根据分镜类型自动选择机位策略。")
+    style_goal = normalize_style_goal(optional_parameters.get("style_goal"))
+    if not style_goal:
+        assumptions.append("未指定风格目标，将根据故事、素材与分镜类型自动判断整体美学。")
 
     return {
         "title": build_title(story_framework, project_info.get("title")),
@@ -37,14 +42,14 @@ def build_storyboard_request(payload):
         "story_framework": story_framework,
         "main_action": story_request.get("main_action", "").strip(),
         "scene_description": story_request.get("scene_description", "").strip(),
-        "visual_goal": story_request.get("visual_goal", "").strip(),
+        "performance_focus": resolve_performance_focus(story_request),
         "aspect_ratio": normalize_aspect_ratio(optional_parameters.get("aspect_ratio")),
         "image_quality": normalize_image_quality(optional_parameters.get("image_quality")),
         "board_type_hint": normalize_board_type_hint(optional_parameters.get("board_type_hint")),
         "panel_count_hint": optional_parameters.get("panel_count_hint"),
         "duration_hint_seconds": optional_parameters.get("duration_hint_seconds"),
         "camera_movement_preference": camera_pref,
-        "style_goal": optional_parameters.get("style_goal", "").strip(),
+        "style_goal": style_goal,
         "allow_minor_inference": optional_parameters.get("allow_minor_inference", True),
         "assumptions": assumptions,
     }

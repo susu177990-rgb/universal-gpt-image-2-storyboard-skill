@@ -41,7 +41,7 @@
 
 - 主动作：默认与核心故事一体
 - 场景描述：优先场景参考图，否则导演推断
-- 视觉目标：优先角色/产品等参考图 + 故事推断
+- 表演重点：优先角色/产品等参考图 + 故事推断
 
 如果缺少关键输入：
 
@@ -53,7 +53,7 @@
 目标：
 
 - 为每个素材分配唯一职责，产出 `asset_lock_map`
-- 在素材锁定完成后，补全 `main_action`、`scene_description`、`visual_goal`
+- 在素材锁定完成后，补全 `main_action`、`scene_description`、`performance_focus`
 - 推断规则见 `scripts/infer_story_fields.py` 与 `references/02_input_requirements.md`
 
 最低要求：

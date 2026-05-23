@@ -35,7 +35,7 @@ def render_story_section(storyboard_request: Dict[str, Any]) -> str:
             f"- 核心故事：{storyboard_request.get('story_framework')}",
             f"- 动作理解 {mark('main_action')}：{storyboard_request.get('main_action')}",
             f"- 场景描述 {mark('scene_description')}：{storyboard_request.get('scene_description')}",
-            f"- 视觉目标 {mark('visual_goal')}：{storyboard_request.get('visual_goal')}",
+            f"- 表演重点 {mark('performance_focus')}：{storyboard_request.get('performance_focus')}",
         ]
     )
     assumptions = storyboard_request.get("assumptions", [])
@@ -108,7 +108,7 @@ def render_prompt_body(storyboard_request: Dict[str, Any], asset_lock_map: Dict[
         f"核心故事：{storyboard_request.get('story_framework')}",
         f"动作理解：{storyboard_request.get('main_action')}",
         f"场景描述：{storyboard_request.get('scene_description')}",
-        f"视觉目标：{storyboard_request.get('visual_goal')}",
+        f"表演重点：{storyboard_request.get('performance_focus')}",
         f"输出形态：{output_format}",
         f"画幅比例：每个分镜格内部使用 {aspect_ratio}",
         f"输出画质：{image_quality}",

@@ -14,6 +14,7 @@ from pipeline_common import (
     derive_subject_label,
     dump_json,
     load_input,
+    normalize_style_goal,
     resolve_assets,
 )
 
@@ -122,7 +123,7 @@ def main() -> None:
                 "panel_count_hint": optional_parameters.get("panel_count_hint"),
                 "duration_hint_seconds": optional_parameters.get("duration_hint_seconds"),
                 "camera_movement_preference": optional_parameters.get("camera_movement_preference", ""),
-                "style_goal": optional_parameters.get("style_goal", ""),
+                "style_goal": normalize_style_goal(optional_parameters.get("style_goal")),
                 "allow_minor_inference": optional_parameters.get("allow_minor_inference", True),
             }
         )

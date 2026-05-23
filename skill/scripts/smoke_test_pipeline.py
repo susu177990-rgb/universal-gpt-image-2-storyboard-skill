@@ -15,8 +15,6 @@ CASES = [
             "project_info": {
                 "title": "霓虹武士饮酒",
                 "output_purpose": "带文字导演故事板",
-                "generation_mode": "直接执行生图",
-                "output_language": "简体中文",
             },
             "story_request": {
                 "story_framework": "一个武士坐在酒吧里，拿起发光瓶子喝酒。",
@@ -60,8 +58,6 @@ CASES = [
             "project_info": {
                 "title": "镜中恶魔",
                 "output_purpose": "无文字分镜宫格图",
-                "generation_mode": "直接执行生图",
-                "output_language": "简体中文",
             },
             "story_request": {
                 "story_framework": "女孩触摸镜子，镜中倒影逐步变成恶魔。",

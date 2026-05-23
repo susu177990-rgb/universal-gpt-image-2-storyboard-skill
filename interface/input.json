@@ -12,11 +12,10 @@
     "project_info": {
       "type": "object",
       "title": "项目信息",
-      "description": "决定输出形态与是否执行生图。素材与文本均为必填，由系统自动采用混合输入模式。",
+      "description": "填写输出形态等项目信息。素材与文本均为必填，生图与中文输出由系统自动处理。",
       "ui_component": "section",
       "required": [
-        "output_purpose",
-        "generation_mode"
+        "output_purpose"
       ],
       "properties": {
         "title": {
@@ -34,26 +33,6 @@
             "无文字分镜宫格图"
           ],
           "default": "带文字导演故事板",
-          "ui_component": "select"
-        },
-        "generation_mode": {
-          "type": "string",
-          "title": "图片执行模式",
-          "description": "是否在输出分镜方案的同时执行生图。当前固定为直接生图。",
-          "enum": [
-            "直接执行生图"
-          ],
-          "default": "直接执行生图",
-          "ui_component": "select"
-        },
-        "output_language": {
-          "type": "string",
-          "title": "输出语言",
-          "description": "分镜方案、提示词与说明文字的输出语言。",
-          "enum": [
-            "简体中文"
-          ],
-          "default": "简体中文",
           "ui_component": "select"
         }
       }

@@ -12,6 +12,7 @@ from pipeline_common import (
     derive_subject_label,
     dump_json,
     load_input,
+    normalize_output_purpose,
     resolve_assets,
 )
 
@@ -108,9 +109,9 @@ def main() -> None:
         storyboard_request = {
             "title": build_title(story_request.get("story_framework", ""), project_info.get("title")),
             "input_mode": "mixed",
-            "output_purpose": project_info.get("output_purpose", "review_or_pitch"),
-            "generation_mode": project_info.get("generation_mode", "generate_image"),
-            "output_language": project_info.get("output_language", "zh-CN"),
+            "output_purpose": normalize_output_purpose(project_info.get("output_purpose")) or "review_or_pitch",
+            "generation_mode": "generate_image",
+            "output_language": "zh-CN",
             "story_framework": story_request.get("story_framework", ""),
             "main_action": story_request.get("main_action", ""),
             "scene_description": story_request.get("scene_description", ""),

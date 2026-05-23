@@ -4,9 +4,7 @@ from pipeline_common import (
     load_input,
     normalize_aspect_ratio,
     normalize_board_type_hint,
-    normalize_generation_mode,
     normalize_image_quality,
-    normalize_output_language,
     normalize_output_purpose,
 )
 
@@ -29,8 +27,8 @@ def build_storyboard_request(payload):
         "title": build_title(story_request.get("story_framework", ""), project_info.get("title")),
         "input_mode": "mixed",
         "output_purpose": normalize_output_purpose(project_info.get("output_purpose")) or "review_or_pitch",
-        "generation_mode": normalize_generation_mode(project_info.get("generation_mode")),
-        "output_language": normalize_output_language(project_info.get("output_language")),
+        "generation_mode": "generate_image",
+        "output_language": "zh-CN",
         "story_framework": story_request.get("story_framework", "").strip(),
         "main_action": story_request.get("main_action", "").strip(),
         "scene_description": story_request.get("scene_description", "").strip(),

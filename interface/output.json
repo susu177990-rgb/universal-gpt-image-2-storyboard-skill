@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "故事板输出结果",
+  "properties": {
+    "storyboard_request": {
+      "type": "object",
+      "title": "标准化请求"
+    },
+    "asset_lock_map": {
+      "type": "object",
+      "title": "素材锁定结果"
+    },
+    "storyboard_plan": {
+      "type": "object",
+      "title": "分镜规划结果",
+      "description": "结构化的导演规划结果，包括分镜类型、格数、连续性规则和每格功能。"
+    },
+    "master_prompt_markdown": {
+      "type": "string",
+      "title": "Markdown 提示词",
+      "ui_component": "markdown_viewer"
+    },
+    "generation_mode": {
+      "type": "string",
+      "title": "执行模式",
+      "enum": ["generate_image"]
+    },
+    "generated_image_url": {
+      "type": ["string", "null"],
+      "title": "最终分镜图文件",
+      "format": "uri",
+      "ui_component": "image_viewer"
+    },
+    "image_error": {
+      "type": "object",
+      "title": "图片执行错误",
+      "description": "当图片执行失败或未接入真实执行器时，返回结构化错误信息。"
+    }
+  }
+}

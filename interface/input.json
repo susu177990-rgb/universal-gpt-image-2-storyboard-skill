@@ -1,0 +1,217 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "故事板输入表单",
+  "required": [
+    "project_info",
+    "story_request",
+    "provided_assets"
+  ],
+  "properties": {
+    "project_info": {
+      "type": "object",
+      "title": "项目信息",
+      "required": [
+        "input_mode",
+        "output_purpose",
+        "generation_mode"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "title": "项目标题",
+          "description": "可选。不填时由系统自动生成。"
+        },
+        "input_mode": {
+          "type": "string",
+          "title": "输入模式",
+          "enum": [
+            "asset_driven",
+            "text_only",
+            "mixed"
+          ],
+          "enumNames": [
+            "主要依赖素材",
+            "纯文本创作",
+            "素材与文本混合"
+          ]
+        },
+        "output_purpose": {
+          "type": "string",
+          "title": "输出目的",
+          "enum": [
+            "review_or_pitch",
+            "model_reference"
+          ],
+          "enumNames": [
+            "给人审核 / 提案",
+            "给模型参考"
+          ]
+        },
+        "generation_mode": {
+          "type": "string",
+          "title": "图片执行模式",
+          "enum": [
+            "generate_image"
+          ],
+          "enumNames": [
+            "直接执行生图"
+          ]
+        },
+        "output_language": {
+          "type": "string",
+          "title": "输出语言",
+          "enum": ["zh-CN"],
+          "default": "zh-CN"
+        }
+      }
+    },
+    "story_request": {
+      "type": "object",
+      "title": "故事请求",
+      "required": [
+        "story_framework",
+        "main_action",
+        "scene_description"
+      ],
+      "properties": {
+        "story_framework": {
+          "type": "string",
+          "title": "核心故事",
+          "description": "用一句话描述你想让这一段发生什么。"
+        },
+        "main_action": {
+          "type": "string",
+          "title": "主动作",
+          "description": "明确写出谁或什么在做什么。"
+        },
+        "scene_description": {
+          "type": "string",
+          "title": "场景描述",
+          "description": "描述环境、空间关系、时间或光线。"
+        },
+        "visual_goal": {
+          "type": "string",
+          "title": "视觉目标",
+          "description": "可选。说明你最在意的视觉结果，例如：强调压迫感、强调产品特写、强调空间建立。"
+        }
+      }
+    },
+    "provided_assets": {
+      "type": "array",
+      "title": "素材列表",
+      "description": "上传参考图，并明确每个素材在最终画面中的职责。若输入模式为纯文本创作，可为空数组。",
+      "ui_component": "asset_uploader",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "required": ["asset_id", "role_tag", "asset_url"],
+        "properties": {
+          "asset_id": {
+            "type": "string",
+            "title": "素材 ID"
+          },
+          "role_tag": {
+            "type": "string",
+            "title": "素材角色",
+            "enum": [
+              "Character",
+              "Scene",
+              "Prop",
+              "Product",
+              "Costume",
+              "Style",
+              "Lighting",
+              "Motion",
+              "PreviousFrame",
+              "Layout"
+            ],
+            "enumNames": [
+              "角色",
+              "场景",
+              "道具",
+              "产品",
+              "服装",
+              "风格",
+              "光照",
+              "运动",
+              "上一帧",
+              "布局"
+            ]
+          },
+          "asset_url": {
+            "type": "string",
+            "title": "素材链接",
+            "format": "uri"
+          },
+          "description": {
+            "type": "string",
+            "title": "素材描述",
+            "description": "简短描述这张图里的关键特征。"
+          },
+          "must_keep": {
+            "type": "string",
+            "title": "必须继承",
+            "description": "例如：脸型、盔甲纹样、瓶子造型、室内布局。"
+          },
+          "must_avoid": {
+            "type": "string",
+            "title": "禁止继承",
+            "description": "例如：模特脸、路人、背景文字、风格图中的人物。"
+          }
+        }
+      }
+    },
+    "optional_parameters": {
+      "type": "object",
+      "title": "可选参数",
+      "properties": {
+        "board_type_hint": {
+          "type": "string",
+          "title": "分镜类型偏好",
+          "enum": [
+            "Action Progression",
+            "Spatial Establishing",
+            "Transition",
+            "Emotion Performance",
+            "Continuous Shot",
+            "Multi-Shot",
+            "Product Interaction"
+          ]
+        },
+        "aspect_ratio": {
+          "type": "string",
+          "title": "画幅比例",
+          "enum": ["16:9", "9:16", "1:1", "4:3", "2.35:1"],
+          "default": "16:9"
+        },
+        "panel_count_hint": {
+          "type": "integer",
+          "title": "镜头格数偏好",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "duration_hint_seconds": {
+          "type": "number",
+          "title": "时长参考（秒）",
+          "minimum": 0
+        },
+        "camera_movement_preference": {
+          "type": "string",
+          "title": "机位偏好",
+          "description": "例如：固定机位、推镜头、摇摄、环绕。"
+        },
+        "style_goal": {
+          "type": "string",
+          "title": "风格目标",
+          "description": "可选。描述希望的视觉媒介或风格方向。"
+        },
+        "allow_minor_inference": {
+          "type": "boolean",
+          "title": "允许自动补全次要细节",
+          "default": true
+        }
+      }
+    }
+  }
+}

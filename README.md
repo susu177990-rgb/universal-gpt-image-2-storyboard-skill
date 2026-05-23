@@ -1,3 +1,11 @@
+<p align="right">
+  <strong>Language / 语言：</strong>
+  <a href="#中文">中文</a> ·
+  <a href="#english">English</a>
+</p>
+
+<a id="中文"></a>
+
 # universal-storyboard-skill
 
 通用故事板设计与生成技能。把结构化表单和参考素材，转成**素材锁定明确、导演规划清晰、可直接执行**的分镜方案与提示词。
@@ -269,3 +277,283 @@ python skill/scripts/smoke_test_pipeline.py
 - 工作流：[`skill/workflow.md`](skill/workflow.md)
 - 质检清单：[`skill/references/09_quality_control.md`](skill/references/09_quality_control.md)
 - 失败案例：[`skill/references/10_failure_cases.md`](skill/references/10_failure_cases.md)
+
+<p align="right"><a href="#中文">↑ 回到顶部</a> · <a href="#english">English ↓</a></p>
+
+---
+
+<a id="english"></a>
+
+# universal-storyboard-skill
+
+A universal storyboard design and generation skill. It turns structured form inputs and reference assets into **asset-locked, director-planned, execution-ready** storyboard plans and prompts.
+
+The goal is not to stack flashy prompt words, but to follow a stable pipeline:
+
+```text
+Form Input → Asset Locking → Director Planning → Renderer Selection → Prompt Generation → QA → Output
+```
+
+---
+
+## Use Cases
+
+- Plan multi-panel storyboards from reference images (character, scene, product, costume, etc.)
+- Distinguish between **human review / pitch** and **downstream model reference** output modes
+- Enforce asset role isolation (e.g., a costume image locks clothing only — not the model's identity)
+- Support common board types: action progression, spatial establishing, transitions, emotion/performance, product interaction, continuous shots, multi-camera setups
+
+---
+
+## Core Capabilities
+
+| Capability | Description |
+|------------|-------------|
+| Asset locking | Assign a unique role to each asset; define what must be inherited and what must not |
+| Director planning | Auto-select board type, panel count, camera strategy, and continuity rules |
+| Dual renderers | `six_zone_pitch_sheet` (6-zone pitch board) or `clean_reference_board` (clean reference board) |
+| Structured output | Return intermediate objects, Markdown prompts, image results, or structured errors together |
+| Chinese-first UX | Default Chinese user experience and Chinese prompts |
+
+---
+
+## Directory Structure
+
+```text
+universal-storyboard-skill/
+├── README.md                 # This file
+├── interface/                # Input/output JSON Schema
+│   ├── input.json
+│   └── output.json
+└── skill/
+    ├── SKILL.md              # Agent entry: triggers, read order, constraints
+    ├── workflow.md           # Internal main workflow
+    ├── references/           # Rules and methods (architecture, input, assets, boards, QA, etc.)
+    ├── assets/               # Board blueprints, style guides, output contract templates
+    ├── examples/             # 7 request examples + good vs bad output comparison
+    └── scripts/              # Repeatable Python helper pipeline
+```
+
+**Single source of truth:**
+
+- `SKILL.md` — Entry routing only; does not duplicate the full methodology
+- `workflow.md` — The one main workflow
+- `interface/*.json` — Input/output contracts
+- `references/*.md` — Reasoning rules
+- `assets/board_blueprints/*.md` — Concrete board templates
+- `scripts/*.py` — Deterministic helper processing
+
+---
+
+## Quick Start
+
+### As an Agent Skill
+
+After installing or referencing this skill, the agent follows `skill/SKILL.md`:
+
+1. Read architecture and workflow
+2. Validate form input
+3. Complete asset locking and director planning
+4. Select renderer based on output purpose
+5. Generate Markdown prompts and self-check
+
+Trigger keywords: storyboard, 分镜, asset locking, director planning, six-zone pitch board, reference board.
+
+### As a Pipeline Script
+
+Python 3 required. No extra dependencies.
+
+```bash
+# Run from a JSON file
+python skill/scripts/run_storyboard_pipeline.py path/to/input.json
+
+# Run from stdin
+cat path/to/input.json | python skill/scripts/run_storyboard_pipeline.py
+
+# Run smoke tests
+python skill/scripts/smoke_test_pipeline.py
+```
+
+Output is JSON with fields such as `storyboard_request`, `asset_lock_map`, `storyboard_plan`, and `master_prompt_markdown`.
+
+---
+
+## Input
+
+Contract: [`interface/input.json`](interface/input.json). Details: [`skill/references/02_input_requirements.md`](skill/references/02_input_requirements.md).
+
+### Minimum Required Fields
+
+| Field | Description |
+|-------|-------------|
+| `project_info.input_mode` | `asset_driven` / `text_only` / `mixed` |
+| `project_info.output_purpose` | `review_or_pitch` (for humans) or `model_reference` (for models) |
+| `project_info.generation_mode` | Currently fixed to `generate_image` |
+| `story_request.story_framework` | One-sentence core story |
+| `story_request.main_action` | Who or what is doing what |
+| `story_request.scene_description` | Environment, space, lighting |
+| `provided_assets` | Asset list; may be empty in text-only mode |
+
+### Asset Roles (`role_tag`)
+
+`Character` · `Scene` · `Prop` · `Product` · `Costume` · `Style` · `Lighting` · `Motion` · `PreviousFrame` · `Layout`
+
+Recommended per asset:
+
+- `must_keep` — Must inherit (e.g., face shape, product form, spatial layout)
+- `must_avoid` — Must not inherit (e.g., model face, people in style refs, background text)
+
+### Optional Parameters
+
+- `board_type_hint` — Preferred board type
+- `aspect_ratio` — Aspect ratio (default `16:9`)
+- `panel_count_hint` — Panel count (1–12)
+- `duration_hint_seconds` — Duration reference
+- `camera_movement_preference` — Camera preference
+- `style_goal` — Style target
+- `allow_minor_inference` — Allow auto-filling minor details (default `true`)
+
+---
+
+## Output
+
+Contract: [`interface/output.json`](interface/output.json).
+
+| Field | Description |
+|-------|-------------|
+| `storyboard_request` | Normalized user goals and constraints |
+| `asset_lock_map` | Per-asset roles, inherit rules, and avoid rules |
+| `storyboard_plan` | Board type, panel count, camera, continuity rules, per-panel function |
+| `master_prompt_markdown` | Final executable Markdown prompt |
+| `generation_mode` | Execution mode; currently `generate_image` |
+| `generated_image_url` | Storyboard image URL on success |
+| `image_error` | Structured error on failure or when no executor is connected |
+
+**Note:** Prompts and images are not mutually exclusive. Even if image generation fails, Markdown prompts and structured errors must still be returned.
+
+---
+
+## Intermediate Objects (Required Before Final Prompt)
+
+Before writing the final prompt, three objects must be clear internally:
+
+1. **`storyboard_request`** — What the user wants
+2. **`asset_lock_map`** — What each asset controls and what it must not leak
+3. **`storyboard_plan`** — Board type, panel count, per-panel function, continuity risks
+
+If any of these is unclear, do not write the final large prompt directly.
+
+---
+
+## Board Types
+
+See [`skill/references/05_board_types.md`](skill/references/05_board_types.md).
+
+| Type | Best For |
+|------|----------|
+| `continuous_shot_board` | One-shot, follow cam, continuous dolly/pan/tilt |
+| `multi_shot_board` | Multi-camera in one scene, shot-reverse-shot, coverage changes |
+| `spatial_establishing_board` | Location establishing, exterior-to-interior, spatial relationships |
+| `action_progression_board` | Staged action progression |
+| `transition_board` | Scene or state transitions |
+| `emotion_performance_board` | Emotion and performance focus |
+| `product_interaction_board` | Product showcase and interaction |
+
+If unspecified, the system auto-selects based on story request and assets.
+
+---
+
+## Output Formats (Renderers)
+
+| Renderer | Purpose | Spec |
+|----------|---------|------|
+| `six_zone_pitch_sheet` | Pitch, review, human approval | Header + lock zone + camera zone + keyframe zone + panel grid + technical footer |
+| `clean_reference_board` | Image-to-video, downstream visual models | Pure image panels, no labels or UI chrome |
+
+Selection rules:
+
+- `output_purpose = review_or_pitch` → default 6-zone pitch board
+- `output_purpose = model_reference` → clean reference board
+
+Renderers handle presentation only; they do not change director planning.
+
+---
+
+## Examples
+
+Full request examples live in `skill/examples/`:
+
+| File | Scenario |
+|------|----------|
+| `01_simple_request.md` | Simple request (astronaut walking on the Moon) |
+| `02_multi_asset_request.md` | Multi-asset mixed input |
+| `03_action_progression_request.md` | Action progression |
+| `04_spatial_establishing_request.md` | Spatial establishing |
+| `05_product_interaction_request.md` | Product interaction |
+| `06_transition_request.md` | Transition |
+| `07_bad_vs_good_outputs.md` | Good vs bad output comparison |
+
+---
+
+## Helper Scripts
+
+| Script | Purpose |
+|--------|---------|
+| `run_storyboard_pipeline.py` | End-to-end pipeline: validate → lock → plan → render |
+| `validate_storyboard_request.py` | Input validation |
+| `compress_user_brief.py` | Build `storyboard_request` |
+| `classify_asset_roles.py` | Build `asset_lock_map` |
+| `plan_storyboard.py` | Build `storyboard_plan` |
+| `render_storyboard_output.py` | Render Markdown prompt |
+| `evaluate_panel_coverage.py` | Evaluate panel coverage |
+| `smoke_test_pipeline.py` | Pipeline smoke test |
+
+---
+
+## Architecture Layers
+
+```text
+User Form Input
+    ↓
+Input Contract Layer       interface/input.json
+    ↓
+Understanding & Lock Layer storyboard_request + asset_lock_map
+    ↓
+Director Planning Layer    storyboard_plan
+    ↓
+Renderer Layer             six_zone_pitch_sheet / clean_reference_board
+    ↓
+Executor Layer             generate_image (optional)
+    ↓
+Structured Output / Image Result
+```
+
+Full details: [`skill/references/00_architecture.md`](skill/references/00_architecture.md).
+
+---
+
+## Design Principles
+
+- **Single-form entry**: Internal staged processing; minimal clarification when needed (max 1–2 questions per round)
+- **Strong asset locking**: Prevent style/costume/scene refs from leaking unrelated identities
+- **Director-style planning**: Each panel has a distinct visual function; avoid duplicate "pretty frames"
+- **Concrete and executable**: Use shot size, camera position, action stage, and spatial anchors instead of vague adjectives
+- **Token-efficient**: Load references and blueprints on demand; do not duplicate all rules at entry
+
+## Explicit Non-Goals
+
+- Do not treat the 6-zone pitch board as the only valid output
+- Do not default-inherit unrelated identities from reference images
+- Do not silently omit image errors when no executor is connected
+- Do not maintain the legacy `/start → /assets → /prompt → /storyboard` multi-turn command flow
+
+---
+
+## Further Reading
+
+- Agent entry: [`skill/SKILL.md`](skill/SKILL.md)
+- Workflow: [`skill/workflow.md`](skill/workflow.md)
+- QA checklist: [`skill/references/09_quality_control.md`](skill/references/09_quality_control.md)
+- Failure cases: [`skill/references/10_failure_cases.md`](skill/references/10_failure_cases.md)
+
+<p align="right"><a href="#english">↑ Back to top</a> · <a href="#中文">中文 ↑</a></p>

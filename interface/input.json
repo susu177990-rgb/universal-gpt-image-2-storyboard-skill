@@ -203,8 +203,19 @@
         "camera_movement_preference": {
           "type": "string",
           "title": "机位偏好",
-          "description": "可选。例如：固定机位、推镜头、摇摄、环绕、跟拍。",
-          "ui_component": "text"
+          "description": "可选。不选「自动推断」时，将优先采用对应机位策略。",
+          "enum": [
+            "自动推断",
+            "固定机位",
+            "推镜头",
+            "拉镜头",
+            "摇摄",
+            "跟拍",
+            "环绕拍摄",
+            "手持纪实"
+          ],
+          "default": "自动推断",
+          "ui_component": "select"
         },
         "style_goal": {
           "type": "string",

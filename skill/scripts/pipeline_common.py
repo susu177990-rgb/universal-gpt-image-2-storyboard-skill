@@ -172,6 +172,21 @@ ASPECT_RATIO_ALIASES = {
     "2.35:1 电影宽银幕": "2.35:1",
 }
 
+CAMERA_PREFERENCE_ALIASES = {
+    "自动推断": "",
+    "固定机位": "固定机位，保持稳定构图推进叙事。",
+    "推镜头": "以推镜头为主，逐步靠近主体并强化情绪或细节。",
+    "拉镜头": "以拉镜头为主，从整体到局部或逐步揭示空间关系。",
+    "摇摄": "以摇摄为主，在同一机位水平或垂直扫视空间。",
+    "跟拍": "以跟拍为主，摄影机随主体移动并保持相对稳定的构图。",
+    "环绕拍摄": "以环绕拍摄为主，围绕主体或产品做弧向运动。",
+    "手持纪实": "以手持纪实风格为主，保留轻微运动感和现场呼吸。",
+    "Static": "固定机位，保持稳定构图推进叙事。",
+    "Tracking": "以跟拍为主，摄影机随主体移动并保持相对稳定的构图。",
+    "Pan": "以摇摄为主，在同一机位水平或垂直扫视空间。",
+    "Locked Camera": "固定机位，保持稳定构图推进叙事。",
+}
+
 
 def normalize_input_mode(value: Optional[str]) -> Optional[str]:
     if value is None:
@@ -202,6 +217,15 @@ def normalize_aspect_ratio(value: Optional[str]) -> str:
         return "16:9"
     cleaned = str(value).strip()
     return ASPECT_RATIO_ALIASES.get(cleaned, cleaned if cleaned in ASPECT_RATIO_ALIASES.values() else "16:9")
+
+
+def normalize_camera_preference(value: Optional[str]) -> str:
+    if value is None:
+        return ""
+    cleaned = str(value).strip()
+    if not cleaned:
+        return ""
+    return CAMERA_PREFERENCE_ALIASES.get(cleaned, cleaned)
 
 
 IMAGE_QUALITY_ALIASES = {

@@ -4,6 +4,7 @@ from pipeline_common import (
     load_input,
     normalize_aspect_ratio,
     normalize_board_type_hint,
+    normalize_camera_preference,
     normalize_image_quality,
     normalize_input_mode,
     normalize_output_purpose,
@@ -23,6 +24,9 @@ def build_storyboard_request(payload):
         assumptions.append("未指定输出画质，默认使用 2K。")
     if not optional_parameters.get("board_type_hint"):
         assumptions.append("未指定分镜类型偏好，将根据故事与素材自动判断。")
+    camera_pref = normalize_camera_preference(optional_parameters.get("camera_movement_preference"))
+    if not camera_pref:
+        assumptions.append("未指定机位偏好，将根据分镜类型自动选择机位策略。")
 
     return {
         "title": build_title(story_framework, project_info.get("title")),
@@ -39,7 +43,7 @@ def build_storyboard_request(payload):
         "board_type_hint": normalize_board_type_hint(optional_parameters.get("board_type_hint")),
         "panel_count_hint": optional_parameters.get("panel_count_hint"),
         "duration_hint_seconds": optional_parameters.get("duration_hint_seconds"),
-        "camera_movement_preference": optional_parameters.get("camera_movement_preference", "").strip(),
+        "camera_movement_preference": camera_pref,
         "style_goal": optional_parameters.get("style_goal", "").strip(),
         "allow_minor_inference": optional_parameters.get("allow_minor_inference", True),
         "assumptions": assumptions,

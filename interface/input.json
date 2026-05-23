@@ -40,13 +40,13 @@
         },
         "output_purpose": {
           "type": "string",
-          "title": "输出目的",
-          "description": "决定最终分镜图采用哪种呈现形态：给人审核的 6 区提案板，或给下游模型的纯净参考板。",
+          "title": "输出形态",
+          "description": "决定最终分镜图的呈现方式：带分区说明的导演故事板，或仅含画面的无文字宫格图。",
           "enum": [
-            "给人审核 / 提案",
-            "给模型参考"
+            "带文字导演故事板",
+            "无文字分镜宫格图"
           ],
-          "default": "给人审核 / 提案",
+          "default": "带文字导演故事板",
           "ui_component": "select"
         },
         "generation_mode": {

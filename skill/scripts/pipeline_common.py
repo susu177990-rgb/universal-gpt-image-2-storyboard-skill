@@ -145,6 +145,8 @@ OUTPUT_PURPOSE_ALIASES = {
     "model_reference": "model_reference",
     "给人审核 / 提案": "review_or_pitch",
     "给模型参考": "model_reference",
+    "带文字导演故事板": "review_or_pitch",
+    "无文字分镜宫格图": "model_reference",
 }
 
 GENERATION_MODE_ALIASES = {

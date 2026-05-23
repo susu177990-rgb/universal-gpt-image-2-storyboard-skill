@@ -1,4 +1,4 @@
-from pipeline_common import dump_json, load_input, normalize_generation_mode, normalize_input_mode, normalize_output_purpose
+from pipeline_common import dump_json, load_input, normalize_generation_mode, normalize_output_purpose
 
 
 def validate_payload(input_data):
@@ -10,8 +10,6 @@ def validate_payload(input_data):
     blockers = []
     risk_points = []
 
-    if not project_info.get("input_mode"):
-        missing.append("project_info.input_mode")
     if not project_info.get("output_purpose"):
         missing.append("project_info.output_purpose")
     if not project_info.get("generation_mode"):
@@ -27,17 +25,18 @@ def validate_payload(input_data):
         missing.append("story_request.scene_description")
         blockers.append("缺少场景描述，无法建立空间关系。")
 
-    input_mode = normalize_input_mode(project_info.get("input_mode"))
-    output_purpose = normalize_output_purpose(project_info.get("output_purpose"))
-    if input_mode in {"asset_driven", "mixed"} and not assets:
+    if not assets:
         missing.append("provided_assets")
-        blockers.append("当前输入模式依赖素材，但没有提供素材列表。")
-    if project_info.get("output_language") not in {"", None, "zh-CN"}:
+        blockers.append("缺少参考素材。本 skill 固定采用素材与文本混合模式，故事请求和素材列表都必填。")
+
+    if project_info.get("output_language") not in {"", None, "zh-CN", "简体中文"}:
         risk_points.append("输出语言不是 zh-CN，可能与全中文目标冲突。")
     if normalize_generation_mode(project_info.get("generation_mode")) != "generate_image":
         risk_points.append("当前 generation_mode 不是 generate_image，将不符合提示词与图片同时输出的要求。")
-    if input_mode == "text_only" and not story_request.get("visual_goal", "").strip():
-        risk_points.append("纯文本模式未提供视觉目标，将更多依赖自动推断。")
+    if not story_request.get("visual_goal", "").strip():
+        risk_points.append("未提供视觉目标，系统将更多依赖故事描述与素材推断重点。")
+
+    normalize_output_purpose(project_info.get("output_purpose"))
 
     return {
         "is_ready": len(blockers) == 0,

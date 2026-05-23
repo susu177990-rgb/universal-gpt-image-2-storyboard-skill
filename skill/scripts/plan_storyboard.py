@@ -107,7 +107,7 @@ def main() -> None:
         optional_parameters = payload.get("optional_parameters", {})
         storyboard_request = {
             "title": build_title(story_request.get("story_framework", ""), project_info.get("title")),
-            "input_mode": project_info.get("input_mode", "mixed"),
+            "input_mode": "mixed",
             "output_purpose": project_info.get("output_purpose", "review_or_pitch"),
             "generation_mode": project_info.get("generation_mode", "generate_image"),
             "output_language": project_info.get("output_language", "zh-CN"),

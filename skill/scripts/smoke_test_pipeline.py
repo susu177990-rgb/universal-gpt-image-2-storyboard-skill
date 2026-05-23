@@ -14,10 +14,9 @@ CASES = [
         "payload": {
             "project_info": {
                 "title": "霓虹武士饮酒",
-                "input_mode": "mixed",
-                "output_purpose": "review_or_pitch",
-                "generation_mode": "generate_image",
-                "output_language": "zh-CN",
+                "output_purpose": "带文字导演故事板",
+                "generation_mode": "直接执行生图",
+                "output_language": "简体中文",
             },
             "story_request": {
                 "story_framework": "一个武士坐在酒吧里，拿起发光瓶子喝酒。",
@@ -28,14 +27,14 @@ CASES = [
             "provided_assets": [
                 {
                     "asset_id": "face_ref",
-                    "role_tag": "Character",
+                    "role_tag": "角色",
                     "asset_url": "https://example.com/face.png",
                     "description": "武士男性脸部参考",
                     "must_keep": "脸型, 发型",
                 },
                 {
                     "asset_id": "armor_ref",
-                    "role_tag": "Costume",
+                    "role_tag": "服装",
                     "asset_url": "https://example.com/armor.png",
                     "description": "日式盔甲参考",
                     "must_keep": "盔甲纹样, 颜色",
@@ -43,27 +42,26 @@ CASES = [
                 },
                 {
                     "asset_id": "bottle_ref",
-                    "role_tag": "Product",
+                    "role_tag": "产品",
                     "asset_url": "https://example.com/bottle.png",
                     "description": "发光玻璃瓶",
                     "must_keep": "瓶子造型, 绿色发光",
                 },
             ],
             "optional_parameters": {
-                "aspect_ratio": "16:9",
+                "aspect_ratio": "16:9 横屏",
                 "allow_minor_inference": True,
             },
         },
     },
     {
-        "name": "text_only_model_reference",
+        "name": "transition_clean_grid",
         "payload": {
             "project_info": {
                 "title": "镜中恶魔",
-                "input_mode": "text_only",
-                "output_purpose": "model_reference",
-                "generation_mode": "generate_image",
-                "output_language": "zh-CN",
+                "output_purpose": "无文字分镜宫格图",
+                "generation_mode": "直接执行生图",
+                "output_language": "简体中文",
             },
             "story_request": {
                 "story_framework": "女孩触摸镜子，镜中倒影逐步变成恶魔。",
@@ -71,10 +69,25 @@ CASES = [
                 "scene_description": "黑暗浴室，镜前低照度环境。",
                 "visual_goal": "强调前状态、触发点、中间态和稳定尾帧。",
             },
-            "provided_assets": [],
+            "provided_assets": [
+                {
+                    "asset_id": "girl_ref",
+                    "role_tag": "角色",
+                    "asset_url": "https://example.com/girl.png",
+                    "description": "女孩正面参考",
+                    "must_keep": "脸型, 发型, 服装",
+                },
+                {
+                    "asset_id": "bathroom_ref",
+                    "role_tag": "场景",
+                    "asset_url": "https://example.com/bathroom.png",
+                    "description": "黑暗浴室",
+                    "must_keep": "镜子的位置, 低照度环境",
+                },
+            ],
             "optional_parameters": {
-                "board_type_hint": "Transition",
-                "aspect_ratio": "9:16",
+                "board_type_hint": "转场",
+                "aspect_ratio": "9:16 竖屏",
             },
         },
     },

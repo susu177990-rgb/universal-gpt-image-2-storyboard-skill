@@ -12,10 +12,9 @@
     "project_info": {
       "type": "object",
       "title": "项目信息",
-      "description": "决定这次分镜的工作方式、输出形态与是否执行生图。",
+      "description": "决定输出形态与是否执行生图。素材与文本均为必填，由系统自动采用混合输入模式。",
       "ui_component": "section",
       "required": [
-        "input_mode",
         "output_purpose",
         "generation_mode"
       ],
@@ -25,18 +24,6 @@
           "title": "项目标题",
           "description": "可选。用于命名本次分镜方案；不填时系统会根据核心故事自动生成。",
           "ui_component": "text"
-        },
-        "input_mode": {
-          "type": "string",
-          "title": "输入模式",
-          "description": "说明本次创作主要依赖素材、纯文本，还是两者混合。会影响是否必须上传参考图。",
-          "enum": [
-            "主要依赖素材",
-            "纯文本创作",
-            "素材与文本混合"
-          ],
-          "default": "素材与文本混合",
-          "ui_component": "select"
         },
         "output_purpose": {
           "type": "string",
@@ -111,9 +98,9 @@
     "provided_assets": {
       "type": "array",
       "title": "素材列表",
-      "description": "上传参考图，并为每张图指定职责。系统会据此生成素材锁定表，防止角色、服装、风格等串位继承。纯文本创作时可为空。",
+      "description": "必填。上传参考图并为每张图指定职责；与故事请求共同构成导演规划依据。至少上传 1 张。",
       "ui_component": "asset_uploader",
-      "minItems": 0,
+      "minItems": 1,
       "items": {
         "type": "object",
         "required": [

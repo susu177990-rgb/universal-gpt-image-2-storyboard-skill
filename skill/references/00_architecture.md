@@ -7,8 +7,8 @@
 - 全中文用户体验
 - 单次表单输入即可完成主流程
 - 内部推理分层清晰，便于扩展
-- 默认省 token，只在必要时加载细节
-- 对素材有强锁定能力，对分镜有导演式规划能力
+- 对素材有强锁定能力，并能提炼导演可用锚点
+- 输出完整预制作导演板，而不是轻量分镜板
 
 ## 总体分层
 
@@ -69,24 +69,29 @@
 职责：
 
 - 选择 board type
-- 决定 panel 数量
-- 给每个 panel 分配明确视觉功能
-- 规划时间推进、空间关系、机位与表演重点
-- 输出连续性风险与规避策略
+- 补全 tone、关系、制作语境等导演字段
+- 形成完整的预制作导演板结构
+- 规划 shot list、blocking、camera language、lighting 与 scene rhythm
+- 输出一致性风险与规避策略
 
 核心产物：
 
-- `storyboard_plan`
+- `preproduction_board_plan`
 
 推荐字段：
 
-- `board_type`
-- `output_format`
-- `panel_count`
-- `camera_strategy`
-- `continuity_rules`
-- `panels[]`
+- `concept_block`
+- `tone_and_mood`
+- `visual_direction`
+- `character_bible`
+- `set_and_environment`
+- `blocking_plan`
+- `shot_list[]`
+- `camera_language_summary`
+- `scene_rhythm_summary`
+- `lighting_and_sound`
 - `risk_controls[]`
+- `inferred_fields`
 
 唯一真相源：
 
@@ -101,13 +106,13 @@
 
 职责：
 
-- 把 `storyboard_plan` 转成某种具体输出形式
+- 把 `preproduction_board_plan` 转成某种具体输出形式
 
 当前允许的渲染器：
 
-- `six_zone_pitch_sheet`
-  - 用于提案、汇报、人工审核
-  - 输出带头栏、锁定区、运镜区、关键帧区、分镜网格、技术尾栏的完整展示板
+- `cinematic_preproduction_board`
+  - 默认模式
+  - 输出完整电影级导演预制作板
 - `clean_reference_board`
   - 用于图像转视频或下游视觉模型
   - 输出纯图像分镜，不带说明文字和 UI 装饰
@@ -142,9 +147,8 @@
 
 - `storyboard_request`
 - `asset_lock_map`
-- `storyboard_plan`
+- `preproduction_board_plan`
 - `master_prompt_markdown`
-- `generation_mode`
 - `generated_image_url`
 - `image_error`
 
@@ -174,10 +178,10 @@
 
 ## 当前重构方向
 
-本次重构以以下顺序推进：
+本次升级以以下顺序推进：
 
-1. 统一主流程为“表单直入，内部阶段化处理，必要时最少澄清”
+1. 统一主流程为“表单直入 -> 锚点提取 -> 预制作导演板规划 -> 渲染输出”
 2. 全部改为中文说明
-3. 建立 `storyboard_request -> asset_lock_map -> storyboard_plan -> renderer_output` 的稳定中间层
-4. 让 6 区提案板从“唯一真理”降级为“默认渲染器”
-5. 让输入表单真正覆盖素材锁定、输出目的、连续性和执行模式
+3. 建立 `storyboard_request -> asset_lock_map -> preproduction_board_plan -> renderer_output` 的稳定中间层
+4. 默认替换为完整预制作导演板
+5. 让输入表单覆盖关系、tone、制作语境、镜头数和信息密度

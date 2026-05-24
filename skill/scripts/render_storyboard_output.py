@@ -4,206 +4,274 @@ from pipeline_common import dump_json, load_input, markdown_bullet_list
 
 
 def render_asset_section(asset_lock_map: Dict[str, Any]) -> str:
-    lines = ["## 素材锁定", ""]
+    lines = ["## 素材锁定与锚点", ""]
     assets = asset_lock_map.get("assets", [])
     if not assets:
-        lines.append("- 本次未提供素材，按纯文本创作处理。")
+        lines.append("- 本次未提供素材，按纯文本导演推断处理。")
         return "\n".join(lines)
 
     for asset in assets:
-        lines.append(f"### {asset.get('asset_id') or '未命名素材'}")
+        anchors = asset.get("anchors", {})
+        lines.append(f"### {asset.get('asset_id')}")
         lines.append(f"- 角色：{asset.get('resolved_role')}")
         lines.append(f"- 优先级：{asset.get('priority')}")
         lines.append("- 必须继承：")
         lines.append(markdown_bullet_list(asset.get("must_keep", [])))
         lines.append("- 禁止继承：")
         lines.append(markdown_bullet_list(asset.get("must_avoid", [])))
+        for label, key in [
+            ("身份锚点", "identity_anchors"),
+            ("表演锚点", "performance_anchors"),
+            ("环境锚点", "environment_anchors"),
+            ("光照锚点", "lighting_anchors"),
+            ("道具锚点", "prop_anchors"),
+            ("风格锚点", "style_anchors"),
+        ]:
+            values = anchors.get(key, [])
+            if values:
+                lines.append(f"- {label}：")
+                lines.append(markdown_bullet_list(values))
         lines.append("")
     return "\n".join(lines).rstrip()
 
 
-def render_story_section(storyboard_request: Dict[str, Any]) -> str:
-    inferred = storyboard_request.get("inferred_fields", {})
-    lines = ["## 故事与推断字段", ""]
+def render_request_section(request: Dict[str, Any]) -> str:
+    inferred = request.get("inferred_fields", {})
 
     def mark(field: str) -> str:
         meta = inferred.get(field, {})
         return "（推断）" if meta.get("inferred") else "（用户填写）"
 
-    lines.extend(
-        [
-            f"- 核心故事：{storyboard_request.get('story_framework')}",
-            f"- 动作理解 {mark('main_action')}：{storyboard_request.get('main_action')}",
-            f"- 场景描述 {mark('scene_description')}：{storyboard_request.get('scene_description')}",
-            f"- 表演重点 {mark('performance_focus')}：{storyboard_request.get('performance_focus')}",
-        ]
-    )
-    assumptions = storyboard_request.get("assumptions", [])
+    lines = [
+        "## 故事与导演输入",
+        "",
+        f"- 核心故事：{request.get('story_framework')}",
+        f"- 主动作 {mark('main_action')}：{request.get('main_action')}",
+        f"- 场景描述 {mark('scene_description')}：{request.get('scene_description')}",
+        f"- 表演重点 {mark('performance_focus')}：{request.get('performance_focus')}",
+        f"- 人物关系 {mark('relationship_dynamic')}：{request.get('relationship_dynamic')}",
+        f"- 基调关键词 {mark('tone_keywords')}：{request.get('tone_keywords')}",
+        f"- 制作语境 {mark('production_context')}：{request.get('production_context')}",
+    ]
+    assumptions = request.get("assumptions", [])
     if assumptions:
         lines.extend(["", "### 推断说明", markdown_bullet_list(assumptions)])
     return "\n".join(lines)
 
 
-def render_plan_section(storyboard_plan: Dict[str, Any], storyboard_request: Dict[str, Any] | None = None) -> str:
-    storyboard_request = storyboard_request or {}
+def render_board_plan_section(plan: Dict[str, Any]) -> str:
+    concept = plan.get("concept_block", {})
+    tone = plan.get("tone_and_mood", {})
+    visual = plan.get("visual_direction", {})
+    blocking = plan.get("blocking_plan", {})
+    lighting = plan.get("lighting_and_sound", {})
     lines = [
-        "## 导演规划摘要",
+        "## 预制作导演板摘要",
         "",
-        f"- 分镜类型：`{storyboard_plan.get('board_type')}`",
-        f"- 类型理由：{storyboard_plan.get('board_type_reason')}",
-        f"- 输出形态：`{storyboard_plan.get('output_format')}`",
-        f"- 格数：{storyboard_plan.get('panel_count')}",
-        f"- 机位策略：{storyboard_plan.get('camera_strategy')}",
+        f"- 板型：`{plan.get('board_type')}`",
+        f"- 板型理由：{plan.get('board_type_reason')}",
+        f"- 输出形态：`{plan.get('output_format')}`",
+        "",
+        "### 概念区",
+        f"- 标题：{concept.get('title')}",
+        f"- 副标题：{concept.get('subtitle')}",
+        f"- Logline：{concept.get('logline')}",
+        f"- 题材：{concept.get('genre')}",
+        f"- 时长参考：{concept.get('runtime_hint')}",
+        f"- 场景设定：{concept.get('setting')}",
+        "",
+        "### 情绪与基调",
+        f"- 情绪关键词：{', '.join(tone.get('tags', []))}",
+        f"- 人物关系：{tone.get('relationship_dynamic')}",
+        f"- 表演重心：{tone.get('performance_focus')}",
+        "",
+        "### 视觉方向",
+        f"- 画幅：{visual.get('aspect_ratio')}",
+        f"- 画质：{visual.get('image_quality')}",
+        f"- 风格目标：{visual.get('style_goal')}",
+        f"- 灯光逻辑：{', '.join(visual.get('lighting_direction', []))}",
+        f"- 质感方向：{', '.join(visual.get('style_references', []))}",
+        "",
+        "### 顶视机位与阻挡",
+        f"- 顶视逻辑：{blocking.get('top_view_logic')}",
+        f"- 人物动线：{blocking.get('talent_movement')}",
+        f"- 机位点位：{', '.join(blocking.get('camera_positions', []))}",
+        f"- 机位路线：{', '.join(blocking.get('camera_paths', []))}",
+        "",
+        "### 镜头语言与节奏",
+        f"- 镜头语言：{plan.get('camera_language_summary')}",
+        f"- 节奏摘要：{plan.get('scene_rhythm_summary')}",
+        "",
+        "### 灯光与声音",
+        f"- 灯光计划：{', '.join(lighting.get('lighting_plan', []))}",
+        f"- 摄影说明：{', '.join(lighting.get('cinematography_notes', []))}",
+        f"- 声音质感：{', '.join(lighting.get('sound_texture', []))}",
+        "",
+        "### 风险控制",
+        markdown_bullet_list(plan.get("risk_controls", [])),
+        "",
+        "### Shot List",
+        "",
     ]
-    if storyboard_request.get("image_quality"):
-        lines.append(f"- 输出画质：{storyboard_request.get('image_quality')}")
-    if storyboard_request.get("style_goal"):
-        lines.append(f"- 风格目标：{storyboard_request.get('style_goal')}")
-    lines.extend(
-        [
-            "",
-            "### 连续性规则",
-            markdown_bullet_list(storyboard_plan.get("continuity_rules", [])),
-            "",
-            "### 分镜网格规划",
-            "",
-        ]
-    )
-    for panel in storyboard_plan.get("panels", []):
+    for shot in plan.get("shot_list", []):
         lines.extend(
             [
-                f"#### 第 {panel.get('index')} 格",
-                f"- 景别：{panel.get('shot_size')}",
-                f"- 机位 / 构图：{panel.get('camera')}",
-                f"- 主体位置：{panel.get('subject_position')}",
-                f"- 动作阶段：{panel.get('action')}",
-                f"- 表演重点：{panel.get('performance')}",
-                f"- 空间锚点：{panel.get('spatial_anchor')}",
-                f"- 导演功能：{panel.get('function')}",
+                f"#### Shot {shot.get('shot_id')}",
+                f"- 镜头作用：{shot.get('shot_role')}",
+                f"- 景别：{shot.get('shot_size')}",
+                f"- 角度：{shot.get('camera_angle')}",
+                f"- 运镜：{shot.get('camera_motion')}",
+                f"- Blocking：{shot.get('blocking')}",
+                f"- 动作节拍：{shot.get('action_beat')}",
+                f"- 表演节拍：{shot.get('performance_beat')}",
+                f"- 台词 / 旁白：{shot.get('dialogue_or_voiceover')}",
+                f"- 情绪拍点：{shot.get('mood_beat')}",
+                f"- 灯光说明：{shot.get('lighting_note')}",
+                f"- 存在理由：{shot.get('why_this_shot_exists')}",
                 "",
             ]
         )
     return "\n".join(lines).rstrip()
 
 
-def render_prompt_body(storyboard_request: Dict[str, Any], asset_lock_map: Dict[str, Any], storyboard_plan: Dict[str, Any]) -> str:
-    output_format = storyboard_plan.get("output_format")
-    title = storyboard_request.get("title") or "未命名故事板"
-    aspect_ratio = storyboard_request.get("aspect_ratio", "16:9")
-    image_quality = storyboard_request.get("image_quality", "2K")
-    style_goal = storyboard_request.get("style_goal", "").strip()
-    panels = storyboard_plan.get("panels", [])
-    roles = asset_lock_map.get("assets", [])
+def render_prompt_body(request: Dict[str, Any], asset_lock_map: Dict[str, Any], plan: Dict[str, Any]) -> str:
+    concept = plan.get("concept_block", {})
+    tone = plan.get("tone_and_mood", {})
+    visual = plan.get("visual_direction", {})
+    blocking = plan.get("blocking_plan", {})
+    character_bible = plan.get("character_bible", [])
+    set_plan = plan.get("set_and_environment", {})
+    shot_list = plan.get("shot_list", [])
 
-    locked_identities = []
-    forbidden_inheritance = []
-    for asset in roles:
-        keep = "、".join(asset.get("must_keep", []))
-        avoid = "、".join(asset.get("must_avoid", []))
-        locked_identities.append(f"{asset.get('asset_id')} 负责 {asset.get('resolved_role')}，必须继承：{keep or '按该角色职责继承'}")
-        forbidden_inheritance.append(f"{asset.get('asset_id')} 禁止继承：{avoid or '按该角色职责排除'}")
-
-    header = [
-        f"项目标题：{title}",
-        f"核心故事：{storyboard_request.get('story_framework')}",
-        f"动作理解：{storyboard_request.get('main_action')}",
-        f"场景描述：{storyboard_request.get('scene_description')}",
-        f"表演重点：{storyboard_request.get('performance_focus')}",
-        f"输出形态：{output_format}",
-        f"画幅比例：每个分镜格内部使用 {aspect_ratio}",
-        f"输出画质：{image_quality}",
-        f"分镜类型：{storyboard_plan.get('board_type')}",
-        f"格数：{storyboard_plan.get('panel_count')}",
+    lines = [
+        "请生成一张完整的电影级导演预制作视觉板（Cinematic Pre-Production Board）。",
+        "整体必须像专业影视项目的导演工作板，而不是普通分镜图。",
+        f"画幅比例：整板使用 {visual.get('aspect_ratio')} 输出。",
+        f"画质：{visual.get('image_quality')}。",
+        f"核心故事：{concept.get('logline')}",
+        f"题材与上下文：{concept.get('genre')}，{concept.get('subtitle')}",
+        f"场景设定：{concept.get('setting')}",
+        f"情绪关键词：{', '.join(tone.get('tags', []))}",
+        f"人物关系动态：{tone.get('relationship_dynamic')}",
+        f"风格目标：{visual.get('style_goal')}",
+        "",
+        "整板必须至少包含以下大区块：",
+        "1. 顶部概念区：标题、logline、tone tags、production notes。",
+        "2. 角色参考区：主角色身份、角度、表情、姿态、服装。",
+        "3. 场景与美术区：场景主视图、细节参考、生活化道具。",
+        "4. 顶视机位阻挡区：top view、机位点位、人物动线、镜头方向。",
+        "5. Shot list 主区：按镜头编号组织主要镜头画面。",
+        "6. 底部技术与情绪区：灯光计划、摄影说明、色彩脚本、声音设计、mood references。",
+        "",
+        "角色锁定规则：",
     ]
-
-    prompt_lines: List[str] = []
-    if output_format == "six_zone_pitch_sheet":
-        prompt_lines.extend(
-            [
-                "请生成一张全中文的 6 区故事板提案板。",
-                "区 1 为头部信息栏，展示项目标题、分镜类型和核心元信息。",
-                "区 2 为素材锁定栏，只展示真正需要锁定的角色、服装、产品或场景锚点。",
-                "区 3 为机位与运动规划区，用简洁示意表达摄影机路径和主体运动方向。",
-                "区 4 为关键帧辅助区，展示环境、表情或动作力学重点。",
-                "区 5 为核心分镜网格，按时间顺序展示连续分镜画面。",
-                "区 6 为技术尾栏，概括光照、材质、色彩和关键镜头参数。",
-            ]
+    for asset in asset_lock_map.get("assets", []):
+        lines.append(f"- {asset.get('asset_id')} / {asset.get('resolved_role')} 必须继承：{'、'.join(asset.get('must_keep', []))}")
+        lines.append(f"- {asset.get('asset_id')} 禁止继承：{'、'.join(asset.get('must_avoid', []))}")
+    lines.extend(
+        [
+            "",
+            "角色参考区重点：",
+        ]
+    )
+    for character in character_bible:
+        lines.append(
+            f"- {character.get('asset_id')}：身份锚点 { '、'.join(character.get('identity_anchors', [])) }；"
+            f"表演锚点 { '、'.join(character.get('performance_anchors', [])) }。"
         )
-    else:
-        prompt_lines.extend(
-            [
-                "请生成一张纯净参考板，只包含分镜图像，不包含标题、编号说明框、字幕、参数栏或其他 UI 文本。",
-                "画面必须按时间顺序排布，并让图像本身承担叙事信息。",
-            ]
+    lines.extend(
+        [
+            "",
+            "场景与美术区重点：",
+            f"- 空间功能区：{'、'.join(set_plan.get('space_zones', []))}",
+            f"- 关键道具：{'、'.join(set_plan.get('hero_props', []))}",
+            f"- 生活化说明：{'、'.join(set_plan.get('livability_notes', []))}",
+            "",
+            "顶视机位阻挡区重点：",
+            f"- 顶视逻辑：{blocking.get('top_view_logic')}",
+            f"- 人物动线：{blocking.get('talent_movement')}",
+            f"- 机位点位：{'、'.join(blocking.get('camera_positions', []))}",
+            f"- 机位路线：{'、'.join(blocking.get('camera_paths', []))}",
+            "",
+            "Shot List 区重点：",
+        ]
+    )
+    for shot in shot_list:
+        lines.append(
+            f"- Shot {shot.get('shot_id')}：{shot.get('shot_role')}；{shot.get('shot_size')}；"
+            f"{shot.get('camera_angle')}；{shot.get('camera_motion')}；"
+            f"动作“{shot.get('action_beat')}”；表演“{shot.get('performance_beat')}”。"
         )
-
-    prompt_lines.append("素材锁定规则：")
-    prompt_lines.extend(f"- {line}" for line in locked_identities)
-    prompt_lines.append("禁止继承规则：")
-    prompt_lines.extend(f"- {line}" for line in forbidden_inheritance)
-    prompt_lines.append("连续性规则：")
-    prompt_lines.extend(f"- {line}" for line in storyboard_plan.get("continuity_rules", []))
-    if style_goal:
-        prompt_lines.append(f"风格目标：{style_goal}")
-    prompt_lines.append("分镜内容：")
-    for panel in panels:
-        prompt_lines.append(
-            f"- 第 {panel.get('index')} 格：{panel.get('shot_size')}，{panel.get('camera')}，"
-            f"{panel.get('subject_position')}，动作为“{panel.get('action')}”，"
-            f"表演重点为“{panel.get('performance')}”，空间锚点为“{panel.get('spatial_anchor')}”。"
-        )
-    prompt_lines.append("整体要求：使用具体镜头语言，不使用空泛形容词，保证主体、空间、光线和道具的一致性。")
-
-    return "\n".join(header + [""] + prompt_lines)
+    lines.extend(
+        [
+            "",
+            "灯光与声音区重点：",
+            f"- 灯光计划：{'、'.join(plan.get('lighting_and_sound', {}).get('lighting_plan', []))}",
+            f"- 摄影说明：{'、'.join(plan.get('lighting_and_sound', {}).get('cinematography_notes', []))}",
+            f"- 声音质感：{'、'.join(plan.get('lighting_and_sound', {}).get('sound_texture', []))}",
+            "",
+            "整体要求：信息丰富但不杂乱，电影化、专业、分区清晰，真实影视工业感明显。",
+            "如果输出为带文字导演故事板，则允许清晰的分区标题和最少量说明文字；如果输出为无文字分镜宫格图，则去掉说明性文字，只保留画面叙事。",
+        ]
+    )
+    return "\n".join(lines)
 
 
 def main() -> None:
     payload = load_input()
-    storyboard_request = payload.get("storyboard_request", {})
+    request = payload.get("storyboard_request", {})
     asset_lock_map = payload.get("asset_lock_map", {})
-    storyboard_plan = payload.get("storyboard_plan", {})
-
-    prompt_body = render_prompt_body(storyboard_request, asset_lock_map, storyboard_plan)
+    plan = payload.get("preproduction_board_plan", {})
     markdown = "\n".join(
         [
-            f"# {storyboard_request.get('title') or '未命名故事板'}",
+            f"# {request.get('title') or '未命名预制作导演板'}",
             "",
-            f"- 输出形态：`{storyboard_plan.get('output_format')}`",
-            f"- 图片执行：`{storyboard_request.get('generation_mode', 'generate_image')}`",
+            render_request_section(request),
             "",
             render_asset_section(asset_lock_map),
             "",
-            render_story_section(storyboard_request),
-            "",
-            render_plan_section(storyboard_plan, storyboard_request),
+            render_board_plan_section(plan),
             "",
             "## 最终渲染提示词",
             "",
             "```text",
-            prompt_body,
+            render_prompt_body(request, asset_lock_map, plan),
             "```",
         ]
     )
 
-    generated_image_url = payload.get("generated_image_url")
-    image_error = payload.get("image_error")
-    if not generated_image_url and not image_error:
-        image_error = {
-            "code": "image_not_generated",
-            "message": "当前输出已生成 Markdown 提示词，但未附带图片结果。执行器接入后应在此返回图片链接。",
-        }
-
     dump_json(
         {
-            "storyboard_request": storyboard_request,
+            "storyboard_request": request,
             "asset_lock_map": asset_lock_map,
-            "storyboard_plan": storyboard_plan,
+            "preproduction_board_plan": plan,
             "master_prompt_markdown": markdown,
-            "generation_mode": storyboard_request.get("generation_mode", "generate_image"),
-            "generated_image_url": generated_image_url,
-            "image_error": image_error,
+            "generated_image_url": payload.get("generated_image_url"),
+            "image_error": payload.get("image_error"),
         }
     )
+
+
+def render_request_section(request: Dict[str, Any]) -> str:
+    inferred = request.get("inferred_fields", {})
+
+    def mark(field: str) -> str:
+        return "（推断）" if inferred.get(field, {}).get("inferred") else "（用户填写）"
+
+    lines = [
+        "## 导演输入摘要",
+        "",
+        f"- 核心故事：{request.get('story_framework')}",
+        f"- 主动作 {mark('main_action')}：{request.get('main_action')}",
+        f"- 场景描述 {mark('scene_description')}：{request.get('scene_description')}",
+        f"- 表演重点 {mark('performance_focus')}：{request.get('performance_focus')}",
+        f"- 人物关系 {mark('relationship_dynamic')}：{request.get('relationship_dynamic')}",
+        f"- 基调关键词 {mark('tone_keywords')}：{request.get('tone_keywords')}",
+        f"- 制作语境 {mark('production_context')}：{request.get('production_context')}",
+    ]
+    if request.get("assumptions"):
+        lines.extend(["", "### 推断说明", markdown_bullet_list(request.get("assumptions", []))])
+    return "\n".join(lines)
 
 
 if __name__ == "__main__":

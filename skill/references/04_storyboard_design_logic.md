@@ -13,19 +13,24 @@
 
 ## 产物要求
 
-在进入渲染器前，必须先形成 `storyboard_plan`。
+在进入渲染器前，必须先形成 `preproduction_board_plan`。
 
 推荐结构：
 
 ```json
 {
-  "board_type": "",
-  "output_format": "",
-  "panel_count": 0,
-  "camera_strategy": "",
-  "continuity_rules": [],
-  "panels": [],
-  "risk_controls": []
+  "concept_block": {},
+  "tone_and_mood": {},
+  "visual_direction": {},
+  "character_bible": [],
+  "set_and_environment": {},
+  "blocking_plan": {},
+  "shot_list": [],
+  "camera_language_summary": "",
+  "scene_rhythm_summary": "",
+  "lighting_and_sound": {},
+  "risk_controls": [],
+  "inferred_fields": {}
 }
 ```
 
@@ -104,32 +109,40 @@ panel 数量由信息复杂度决定，不由模板决定。
 - 为了好看硬凑格数
 - 为了省事压缩到看不清动作
 
-## 第五步：给每格分配导演功能
+## 第五步：形成完整导演板字段
 
-每一格都必须有存在理由。
+除了板型与基本镜头判断，还必须补齐：
 
-每格至少回答：
+- `concept_block`
+- `tone_and_mood`
+- `visual_direction`
+- `character_bible`
+- `set_and_environment`
+- `blocking_plan`
+- `camera_language_summary`
+- `scene_rhythm_summary`
+- `lighting_and_sound`
 
-- 这一格负责传达什么新信息
-- 与前一格相比推进了什么
-- 这一格最关键的镜头控制点是什么
+目标不是只有“几格分镜”，而是让输出具备拍摄前导演工作板的完整信息量。
 
-常用功能：
+## 第六步：生成 shot list，而不只是 panel
 
-- 建立地点
-- 建立空间关系
-- 建立主体位置
-- 展示动作起点
-- 展示动作中段
-- 展示动作高点
-- 展示动作收尾
-- 展示表情变化
-- 展示产品交互
-- 展示转场中间态
-- 展示机位变化
-- 展示尾帧停留
+每个 shot 至少包含：
 
-## 第六步：形成连续性规则
+- `shot_id`
+- `shot_role`
+- `shot_size`
+- `camera_angle`
+- `camera_motion`
+- `blocking`
+- `action_beat`
+- `performance_beat`
+- `dialogue_or_voiceover`
+- `mood_beat`
+- `lighting_note`
+- `why_this_shot_exists`
+
+## 第七步：形成连续性规则
 
 在真正写提示词前，必须先写连续性规则。
 
@@ -143,13 +156,13 @@ panel 数量由信息复杂度决定，不由模板决定。
 
 如果提供了上一帧素材，则默认连续性优先级最高。
 
-## 第七步：再进入提示词生成
+## 第八步：再进入提示词生成
 
 只有当以下对象都稳定后，才进入提示词生成：
 
 - `storyboard_request`
 - `asset_lock_map`
-- `storyboard_plan`
+- `preproduction_board_plan`
 
 否则很容易出现下面三种假智能：
 

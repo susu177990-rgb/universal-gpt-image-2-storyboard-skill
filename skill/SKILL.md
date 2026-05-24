@@ -2,7 +2,7 @@
 name: universal-storyboard-skill
 description: >
   通用故事板设计与生成技能。
-  适用于基于结构化表单和素材参考，完成素材锁定、导演式分镜规划，并输出 6 区提案板或纯净参考板的场景。
+  适用于基于结构化表单和素材参考，完成素材锁定、导演式预制作规划，并输出完整预制作导演板或纯净参考板的场景。
 ---
 
 # 通用故事板技能
@@ -27,7 +27,7 @@ description: >
 3. 读取 [references/02_input_requirements.md](references/02_input_requirements.md) 检查输入是否完整。
 4. 读取 [references/03_asset_classification.md](references/03_asset_classification.md) 和 [references/04_storyboard_design_logic.md](references/04_storyboard_design_logic.md) 完成素材锁定和导演规划。
 5. 按输出类型选择渲染规则：
-   - 6 区提案板：读取 [references/07_prompt_writing_rules.md](references/07_prompt_writing_rules.md)
+   - 完整预制作导演板：读取 [references/07_prompt_writing_rules.md](references/07_prompt_writing_rules.md)
    - 纯净参考板：读取 [references/08_video_model_adaptation.md](references/08_video_model_adaptation.md)
 6. 生成结果前，读取 [references/09_quality_control.md](references/09_quality_control.md) 和 [references/10_failure_cases.md](references/10_failure_cases.md) 自检。
 
@@ -37,7 +37,7 @@ description: >
 
 - `storyboard_request`：用户目标与输入约束的标准化结果
 - `asset_lock_map`：每个素材负责什么、禁止继承什么
-- `storyboard_plan`：board type、panel 数量、每格功能、连续性风险
+- `preproduction_board_plan`：完整导演板结构、shot list、blocking、lighting 与风险控制
 
 如果这三个对象还不清晰，不得直接写最终大提示词。
 
@@ -45,7 +45,7 @@ description: >
 
 允许两种渲染结果：
 
-- `six_zone_pitch_sheet`
+- `cinematic_preproduction_board`
 - `clean_reference_board`
 
 本技能的最终结果必须同时包含：
@@ -57,7 +57,7 @@ description: >
 
 ## 禁止事项
 
-- 不要把 6 区提案板当成所有任务唯一正确的输出形态
+- 不要把分镜格子数量当成整个 skill 的核心产物
 - 不要混淆产品协议、推理规则、模板蓝图、执行器说明
 - 不要默认继承风格图、服装图、场景图中的无关人物身份
 - 不要用抽象形容词代替镜头、空间、动作、表演信息

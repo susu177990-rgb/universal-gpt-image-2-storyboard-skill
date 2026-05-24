@@ -4,39 +4,46 @@
 
 ## 最低输出字段
 
-1. **storyboard_plan**
-   - 导演规划的结构化结果
-2. **master_prompt_markdown**
+1. **storyboard_request**
+   - 标准化导演输入与推断字段
+2. **asset_lock_map**
+   - 素材锁定结果与导演锚点
+3. **preproduction_board_plan**
+   - 完整预制作导演板结构
+4. **master_prompt_markdown**
    - Markdown 格式的最终中文提示词
-3. **generation_mode**
-   - 当前固定为 `generate_image`
-4. **generated_image_url**
+5. **generated_image_url**
    - 执行生图成功时返回图片链接
-5. **image_error**
+6. **image_error**
    - 执行失败或未接入真实执行器时返回结构化错误
 
-## `storyboard_plan` 最低结构
+## `preproduction_board_plan` 最低结构
 
 应至少包含：
 
-- `board_type`
-- `output_format`
-- `panel_count`
-- `camera_strategy`
-- `continuity_rules`
-- `panels`
+- `concept_block`
+- `tone_and_mood`
+- `visual_direction`
+- `character_bible`
+- `set_and_environment`
+- `blocking_plan`
+- `shot_list`
+- `camera_language_summary`
+- `scene_rhythm_summary`
+- `lighting_and_sound`
 - `risk_controls`
+- `inferred_fields`
 
 ## `master_prompt_markdown` 要求
 
-如果输出为 `six_zone_pitch_sheet`，则提示词必须表达：
+如果输出为完整预制作导演板，则提示词必须表达：
 
-- 头部信息栏
-- 锁定栏
-- 机位与运动规划区
-- 关键帧辅助区
-- 主分镜网格
-- 技术尾栏
+- 顶部概念区
+- 角色参考区
+- 场景与美术区
+- 顶视机位阻挡区
+- shot list 主区
+- 灯光 / 摄影 / 色彩 / 声音 / mood 区
 
 如果输出为 `clean_reference_board`，则提示词必须表达：
 
@@ -49,5 +56,5 @@
 
 - 不允许只返回大段文学性描述
 - 不允许只返回镜头列表而没有完整渲染指令
-- 不允许跳过 `storyboard_plan` 直接给结果
+- 不允许跳过 `preproduction_board_plan` 直接给结果
 - 不允许把 Markdown 提示词和图片结果做成二选一

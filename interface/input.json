@@ -1,250 +1,159 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "title": "故事板输入表单",
-  "required": [
-    "project_info",
-    "provided_assets",
-    "story_request"
-  ],
-  "propertyOrdering": [
-    "project_info",
-    "provided_assets",
-    "story_request",
-    "optional_parameters"
-  ],
+  "title": "预制作导演板输入表单",
+  "required": ["project_info", "provided_assets", "story_request"],
+  "propertyOrdering": ["project_info", "provided_assets", "story_request", "optional_parameters"],
   "properties": {
     "project_info": {
       "type": "object",
       "title": "项目信息",
-      "ui_order": 1,
-      "ui_component": "section",
-      "required": [
-        "input_mode",
-        "output_purpose"
-      ],
+      "required": ["input_mode", "output_purpose"],
       "properties": {
         "input_mode": {
           "type": "string",
           "title": "输入模式",
-          "enum": [
-            "素材与文本混合",
-            "纯文本创作"
-          ],
-          "default": "素材与文本混合",
-          "ui_component": "select"
+          "enum": ["素材与文本混合", "纯文本创作"],
+          "default": "素材与文本混合"
         },
         "output_purpose": {
           "type": "string",
           "title": "输出形态",
-          "enum": [
-            "带文字导演故事板",
-            "无文字分镜宫格图"
-          ],
-          "default": "带文字导演故事板",
-          "ui_component": "select"
+          "enum": ["带文字导演故事板", "无文字分镜宫格图"],
+          "default": "带文字导演故事板"
         }
       }
     },
     "provided_assets": {
       "type": "array",
       "title": "素材列表",
-      "description": "混合模式下请至少上传 1 张参考图；纯文本模式下可留空。",
-      "ui_order": 2,
+      "description": "混合模式下建议上传角色、场景、服装、产品、风格等参考图；纯文本模式可留空。",
       "ui_component": "asset_uploader",
       "minItems": 0,
       "items": {
         "type": "object",
-        "required": [
-          "asset_id",
-          "role_tag",
-          "asset_url"
-        ],
+        "required": ["asset_id", "role_tag", "asset_url"],
         "properties": {
-          "asset_id": {
-            "type": "string",
-            "title": "素材 ID",
-            "ui_component": "text"
-          },
+          "asset_id": { "type": "string", "title": "素材 ID" },
           "role_tag": {
             "type": "string",
             "title": "素材角色",
-            "enum": [
-              "角色",
-              "场景",
-              "道具",
-              "产品",
-              "服装",
-              "风格",
-              "光照",
-              "运动",
-              "上一帧",
-              "布局"
-            ],
-            "ui_component": "select"
+            "enum": ["角色", "场景", "道具", "产品", "服装", "风格", "光照", "运动", "上一帧", "布局"]
           },
           "asset_url": {
             "type": "string",
             "title": "素材链接",
-            "format": "uri",
-            "ui_component": "image_uploader"
+            "format": "uri"
           },
-          "description": {
-            "type": "string",
-            "title": "素材描述",
-            "ui_component": "textarea"
-          },
-          "must_keep": {
-            "type": "string",
-            "title": "必须继承",
-            "ui_component": "textarea"
-          },
-          "must_avoid": {
-            "type": "string",
-            "title": "禁止继承",
-            "ui_component": "textarea"
-          }
+          "description": { "type": "string", "title": "素材描述" },
+          "must_keep": { "type": "string", "title": "必须继承" },
+          "must_avoid": { "type": "string", "title": "禁止继承" }
         }
       }
     },
     "story_request": {
       "type": "object",
       "title": "故事请求",
-      "description": "填写这一段要拍什么；场景与表演细节可选，留空时系统会在素材锁定后自动推断。",
-      "ui_order": 3,
-      "ui_component": "section",
-      "required": [
-        "story_framework"
-      ],
-      "propertyOrdering": [
-        "story_framework",
-        "scene_description",
-        "performance_focus"
-      ],
+      "required": ["story_framework"],
       "properties": {
         "story_framework": {
           "type": "string",
           "title": "核心故事",
-          "description": "必填。用一句话写清这一段的主体、动作与剧情走向，例如「武士在赛博酒吧里拿起发光瓶饮酒」。",
-          "ui_order": 1,
-          "ui_component": "textarea"
+          "description": "一句话说明这一段要发生什么。"
         },
         "scene_description": {
           "type": "string",
           "title": "场景描述",
-          "description": "可选。描述环境、空间、光照与时间感；留空则跟随场景参考图，无场景图时由导演规划推断。",
-          "ui_order": 2,
-          "ui_component": "textarea"
+          "description": "可选。描述空间、时间、光照与环境气质。"
         },
         "performance_focus": {
           "type": "string",
           "title": "表演重点",
-          "description": "可选。写这一段最想突出的情绪、肢体动作或交互表演；留空则结合角色/产品等参考图与核心故事自动推断。",
-          "ui_order": 3,
-          "ui_component": "textarea"
+          "description": "可选。说明最想突出的表情、动作、互动或情绪。"
+        },
+        "relationship_dynamic": {
+          "type": "string",
+          "title": "人物关系氛围",
+          "description": "例如情侣斗嘴、压迫对峙、陌生试探。"
+        },
+        "tone_keywords": {
+          "type": "string",
+          "title": "基调关键词",
+          "description": "例如 cozy、温暖、尴尬、压抑、现实主义。"
+        },
+        "production_context": {
+          "type": "string",
+          "title": "制作语境",
+          "enum": ["短片", "广告", "情景喜剧", "剧情片", "流媒体短内容"]
         }
       }
     },
     "optional_parameters": {
       "type": "object",
       "title": "可选参数",
-      "ui_order": 4,
-      "ui_component": "section",
       "properties": {
         "board_type_hint": {
           "type": "string",
-          "title": "分镜类型偏好",
-          "enum": [
-            "动作推进",
-            "空间建立",
-            "转场",
-            "情绪表演",
-            "连续镜头",
-            "多机位",
-            "产品交互"
-          ],
-          "ui_component": "select"
+          "title": "板型偏好",
+          "enum": ["动作推进", "空间建立", "转场", "情绪表演", "连续镜头", "多机位", "产品交互"]
         },
         "aspect_ratio": {
           "type": "string",
           "title": "画幅比例",
-          "enum": [
-            "16:9 横屏",
-            "9:16 竖屏",
-            "1:1 方形",
-            "4:3 传统",
-            "2.35:1 电影宽银幕"
-          ],
-          "default": "16:9 横屏",
-          "ui_component": "select"
+          "enum": ["16:9 横屏", "9:16 竖屏", "1:1 方形", "4:3 传统", "2.35:1 电影宽银幕"],
+          "default": "16:9 横屏"
         },
         "image_quality": {
           "type": "string",
           "title": "输出画质",
-          "enum": [
-            "1K 标准",
-            "2K 高清",
-            "4K 超清"
-          ],
-          "default": "2K 高清",
-          "ui_component": "select"
+          "enum": ["1K 标准", "2K 高清", "4K 超清"],
+          "default": "2K 高清"
         },
-        "panel_count_hint": {
+        "shot_count_hint": {
           "type": "integer",
-          "title": "镜头格数偏好",
-          "minimum": 1,
-          "maximum": 12,
-          "ui_component": "number"
+          "title": "总镜头数偏好",
+          "minimum": 4,
+          "maximum": 12
         },
         "duration_hint_seconds": {
           "type": "number",
           "title": "时长参考（秒）",
-          "minimum": 0,
-          "ui_component": "number"
+          "minimum": 0
         },
         "camera_movement_preference": {
           "type": "string",
           "title": "机位偏好",
-          "enum": [
-            "自动推断",
-            "固定机位",
-            "推镜头",
-            "拉镜头",
-            "摇摄",
-            "跟拍",
-            "环绕拍摄",
-            "手持纪实"
-          ],
-          "default": "自动推断",
-          "ui_component": "select"
+          "enum": ["自动推断", "固定机位", "推镜头", "拉镜头", "摇摄", "跟拍", "环绕拍摄", "手持纪实"],
+          "default": "自动推断"
         },
         "style_goal": {
           "type": "string",
           "title": "风格目标",
-          "description": "整体画面美学与媒介方向；选「自动推断」时由系统结合故事与素材决定。有风格参考图时，文字选项作为补充。",
-          "enum": [
-            "自动推断",
-            "电影写实",
-            "胶片纪实",
-            "赛博朋克霓虹",
-            "低饱和冷调",
-            "高饱和广告片",
-            "暖色复古",
-            "黑白胶片",
-            "黑白线稿模式",
-            "水彩插画",
-            "赛璐璐动画",
-            "3D 游戏 CG",
-            "纪录片手持"
-          ],
-          "default": "自动推断",
-          "ui_component": "select"
+          "enum": ["自动推断", "电影写实", "胶片纪实", "赛博朋克霓虹", "低饱和冷调", "高饱和广告片", "暖色复古", "黑白胶片", "黑白线稿模式", "水彩插画", "赛璐璐动画", "3D 游戏 CG", "纪录片手持"],
+          "default": "自动推断"
+        },
+        "board_density": {
+          "type": "string",
+          "title": "信息密度",
+          "enum": ["信息丰富", "平衡", "极简"],
+          "default": "信息丰富"
+        },
+        "render_detail_level": {
+          "type": "string",
+          "title": "细节等级",
+          "enum": ["高", "中", "低"],
+          "default": "高"
+        },
+        "inference_tolerance": {
+          "type": "string",
+          "title": "推断强度",
+          "enum": ["强", "中", "弱"],
+          "default": "强"
         },
         "allow_minor_inference": {
           "type": "boolean",
           "title": "允许自动补全次要细节",
-          "default": true,
-          "ui_component": "checkbox"
+          "default": true
         }
       }
     }

@@ -74,34 +74,29 @@
 
 目标：
 
-- 产出 `storyboard_plan`
+- 产出 `preproduction_board_plan`
 
 必须决定：
 
-- `board_type`
-- `output_format`
-- `panel_count`
-- `camera_strategy`
-- `continuity_rules`
-- `panels[]`
+- `concept_block`
+- `tone_and_mood`
+- `visual_direction`
+- `character_bible`
+- `set_and_environment`
+- `blocking_plan`
+- `shot_list`
+- `camera_language_summary`
+- `scene_rhythm_summary`
+- `lighting_and_sound`
+- `risk_controls`
 
-每个 panel 至少要有：
-
-- 景别
-- 机位 / 构图
-- 主体位置
-- 动作阶段
-- 表演重点
-- 空间锚点
-- 视觉功能
-
-如果还没明确这些字段，不能直接写最终提示词。
+如果还没形成这些字段，不能直接写最终提示词。
 
 ## 阶段 4：渲染器选择
 
 规则：
 
-- 人工审核、汇报、提案：默认 `six_zone_pitch_sheet`
+- 人工审核、汇报、提案：默认 `cinematic_preproduction_board`
 - 图像转视频、模型参考：使用 `clean_reference_board`
 
 渲染器只负责呈现，不改导演规划本身。
@@ -110,7 +105,7 @@
 
 目标：
 
-- 将 `storyboard_plan` 转成最终可执行提示词
+- 将 `preproduction_board_plan` 转成最终可执行提示词
 
 要求：
 
@@ -135,9 +130,8 @@
 
 - `storyboard_request`
 - `asset_lock_map`
-- `storyboard_plan`
+- `preproduction_board_plan`
 - `master_prompt_markdown`
-- `generation_mode`
 - `generated_image_url`
 - `image_error`
 
@@ -147,6 +141,6 @@
 
 - `/start -> /assets -> /prompt -> /storyboard`
 - 先写英文提示词再转换输出
-- 默认 6 区即唯一输出形态
+- 默认轻量分镜板即唯一输出形态
 - 在没有执行器时声称自动生图
 - 把提示词和图片做成互斥输出

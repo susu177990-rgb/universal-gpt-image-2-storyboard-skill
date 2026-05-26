@@ -22,4 +22,6 @@
 
 - `preproduction_board_plan`
 - `master_prompt_markdown`
+- `image_generation_status: awaiting_confirmation`
+- `confirmation_action: 确认生图`
 - `generated_image_url`

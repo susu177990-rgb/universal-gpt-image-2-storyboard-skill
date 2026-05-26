@@ -21,7 +21,9 @@
   ->
 质检
   ->
-仅返回方案 / 执行生图
+返回提示词并等待确认
+  ->
+确认后执行生图
 ```
 
 ## 阶段 1：输入校验
@@ -132,8 +134,24 @@
 - `asset_lock_map`
 - `preproduction_board_plan`
 - `master_prompt_markdown`
+- `image_generation_status`
+- `confirmation_action`
 - `generated_image_url`
 - `image_error`
+
+首轮默认只输出提示词：
+
+- `image_generation_status = awaiting_confirmation`
+- `confirmation_action.label = 确认生图`
+- `generated_image_url = null`
+- `image_error = null`
+- 输入表单不出现生图确认选项
+
+用户点“确认生图”后，才进入图片执行分支：
+
+- 输出表单按钮触发内部 `generation_mode = generate_image`
+- 成功时返回 `generated_image_url`
+- 失败或没有真实执行器时返回 `image_error`
 
 ## 明确废弃
 
@@ -142,5 +160,5 @@
 - `/start -> /assets -> /prompt -> /storyboard`
 - 先写英文提示词再转换输出
 - 默认轻量分镜板即唯一输出形态
-- 在没有执行器时声称自动生图
-- 把提示词和图片做成互斥输出
+- 在用户确认前自动生图
+- 在没有执行器时声称已经生成图片

@@ -222,6 +222,11 @@ def main() -> None:
     request = payload.get("storyboard_request", {})
     asset_lock_map = payload.get("asset_lock_map", {})
     plan = payload.get("preproduction_board_plan", {})
+    generation_mode = request.get("generation_mode", payload.get("generation_mode", "await_confirmation"))
+    generation_confirmed = generation_mode == "generate_image"
+    image_generation_status = "awaiting_confirmation"
+    if generation_confirmed:
+        image_generation_status = "failed" if payload.get("image_error") else "ready"
     markdown = "\n".join(
         [
             f"# {request.get('title') or '未命名预制作导演板'}",
@@ -246,8 +251,16 @@ def main() -> None:
             "asset_lock_map": asset_lock_map,
             "preproduction_board_plan": plan,
             "master_prompt_markdown": markdown,
-            "generated_image_url": payload.get("generated_image_url"),
-            "image_error": payload.get("image_error"),
+            "image_generation_status": image_generation_status,
+            "confirmation_action": None
+            if generation_confirmed
+            else {
+                "label": "确认生图",
+                "generation_mode": "generate_image",
+                "uses_prompt_field": "master_prompt_markdown",
+            },
+            "generated_image_url": payload.get("generated_image_url") if generation_confirmed else None,
+            "image_error": payload.get("image_error") if generation_confirmed else None,
         }
     )
 

@@ -2,18 +2,50 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "title": "预制作导演板输出结果",
-  "propertyOrdering": ["master_prompt_markdown", "generated_image_url"],
+  "propertyOrdering": ["master_prompt_markdown", "image_generation_status", "confirmation_action", "generated_image_url", "image_error"],
   "properties": {
     "master_prompt_markdown": {
       "type": "string",
-      "title": "Markdown 提示词",
+      "title": "Prompt 输出",
+      "description": "首轮先展示这部分，供用户审核。",
       "ui_component": "markdown_viewer"
+    },
+    "image_generation_status": {
+      "type": "string",
+      "title": "生图状态",
+      "enum": ["awaiting_confirmation", "ready", "failed"],
+      "default": "awaiting_confirmation"
+    },
+    "confirmation_action": {
+      "type": ["object", "null"],
+      "title": "确认生图操作",
+      "description": "输出表单中的确认按钮，不出现在输入表单。",
+      "properties": {
+        "label": {
+          "type": "string",
+          "default": "确认生图"
+        },
+        "generation_mode": {
+          "type": "string",
+          "enum": ["generate_image"]
+        },
+        "uses_prompt_field": {
+          "type": "string",
+          "default": "master_prompt_markdown"
+        }
+      },
+      "ui_component": "action_button"
     },
     "generated_image_url": {
       "type": ["string", "null"],
-      "title": "最终结果图",
+      "title": "故事板图片输出",
+      "description": "用户点击确认生图后才显示图片；首轮为 null。",
       "format": "uri",
       "ui_component": "image_viewer"
+    },
+    "image_error": {
+      "type": ["object", "null"],
+      "title": "图片错误"
     }
   }
 }

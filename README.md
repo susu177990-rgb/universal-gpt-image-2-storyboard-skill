@@ -9,7 +9,7 @@
 - 强素材锁定
 - 强导演推断
 - 默认输出完整预制作导演板
-- 同时产出 Markdown 提示词与图片结果
+- 先产出 Markdown 提示词，用户点“确认生图”后再产出图片结果
 
 ## 主链
 
@@ -23,6 +23,8 @@
 preproduction_board_plan
   ->
 Markdown 提示词
+  ->
+等待确认生图
   ->
 图片结果 / 结构化错误
 ```
@@ -82,7 +84,12 @@ Markdown 提示词
 核心输出字段：
 
 - `master_prompt_markdown`
+- `image_generation_status`
+- `confirmation_action`
 - `generated_image_url`
+
+默认首轮输出表单只填充 `Prompt 输出`，并将 `image_generation_status` 标记为 `awaiting_confirmation`。
+用户点输出表单里的“确认生图”后，才填充 `故事板图片输出`，返回 `generated_image_url` 或 `image_error`。
 
 内部能力主产物：
 

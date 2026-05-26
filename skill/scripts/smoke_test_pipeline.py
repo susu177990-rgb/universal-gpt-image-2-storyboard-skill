@@ -91,7 +91,11 @@ def run_case(case):
     assert "asset_lock_map" in payload
     assert "preproduction_board_plan" in payload
     assert "master_prompt_markdown" in payload
+    assert payload["image_generation_status"] == "awaiting_confirmation"
+    assert payload["confirmation_action"]["label"] == "确认生图"
     assert "generated_image_url" in payload
+    assert payload["generated_image_url"] is None
+    assert payload["image_error"] is None
     assert payload["master_prompt_markdown"].startswith("# ")
     assert payload["preproduction_board_plan"]["shot_list"]
     assert payload["preproduction_board_plan"]["concept_block"]

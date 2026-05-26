@@ -25,7 +25,7 @@
     ->
 执行器层
     ->
-结构化输出 / 图片结果
+结构化输出 / 等待确认 / 图片结果
 ```
 
 ## 1. 输入契约层
@@ -129,16 +129,18 @@
 
 职责：
 
-- 决定是否实际发起生图
+- 决定是否等待用户确认或实际发起生图
 
 当前允许的执行模式：
 
 - `generate_image`
-  - 返回结构化分镜方案、Markdown 提示词，并执行生图
+  - 首轮在输出表单返回结构化分镜方案、Markdown 提示词和确认生图操作
+  - 输入表单不承载生图确认选项
+  - 用户在输出表单确认后执行生图
 
 注意：
 
-- 如果没有真正可用的图像生成执行器，也必须保留 Markdown 提示词与结构化错误，不得静默缺失
+- 如果没有真正可用的图像生成执行器，也必须保留 Markdown 提示词；只有用户确认生图后才返回结构化错误，不得静默缺失
 - 执行器是可选层，不是 skill 本体
 
 ## 6. 输出层
@@ -149,6 +151,8 @@
 - `asset_lock_map`
 - `preproduction_board_plan`
 - `master_prompt_markdown`
+- `image_generation_status`
+- `confirmation_action`
 - `generated_image_url`
 - `image_error`
 

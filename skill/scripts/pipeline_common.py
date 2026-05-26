@@ -152,7 +152,11 @@ OUTPUT_PURPOSE_ALIASES = {
 }
 
 GENERATION_MODE_ALIASES = {
+    "await_confirmation": "await_confirmation",
     "generate_image": "generate_image",
+    "先输出提示词，等待确认生图": "await_confirmation",
+    "等待确认生图": "await_confirmation",
+    "确认生图": "generate_image",
     "直接执行生图": "generate_image",
 }
 
@@ -309,8 +313,8 @@ def normalize_output_purpose(value: Optional[str]) -> Optional[str]:
 
 def normalize_generation_mode(value: Optional[str]) -> str:
     if value is None:
-        return "generate_image"
-    return GENERATION_MODE_ALIASES.get(str(value).strip(), "generate_image")
+        return "await_confirmation"
+    return GENERATION_MODE_ALIASES.get(str(value).strip(), "await_confirmation")
 
 
 def normalize_aspect_ratio(value: Optional[str]) -> str:

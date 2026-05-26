@@ -12,10 +12,19 @@
    - 完整预制作导演板结构
 4. **master_prompt_markdown**
    - Markdown 格式的最终中文提示词
-5. **generated_image_url**
+5. **image_generation_status**
+   - `awaiting_confirmation`：首轮已生成提示词，等待用户确认生图
+   - `ready`：已进入确认后的图片执行分支
+   - `failed`：图片执行失败
+6. **confirmation_action**
+   - 首轮在输出表单返回“确认生图”操作，用于触发图片执行分支
+   - 不出现在输入表单
+7. **generated_image_url**
    - 执行生图成功时返回图片链接
-6. **image_error**
+   - 首轮等待确认时必须为 `null`
+8. **image_error**
    - 执行失败或未接入真实执行器时返回结构化错误
+   - 首轮等待确认时必须为 `null`
 
 ## `preproduction_board_plan` 最低结构
 
@@ -57,4 +66,4 @@
 - 不允许只返回大段文学性描述
 - 不允许只返回镜头列表而没有完整渲染指令
 - 不允许跳过 `preproduction_board_plan` 直接给结果
-- 不允许把 Markdown 提示词和图片结果做成二选一
+- 不允许在用户确认前直接返回图片结果

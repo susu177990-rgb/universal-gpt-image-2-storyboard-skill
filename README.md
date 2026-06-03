@@ -1,17 +1,95 @@
+<p align="right">
+  <strong>语言 / Language:</strong>
+  <a href="#中文">中文</a> ·
+  <a href="#english">English</a>
+</p>
+
+<a id="中文"></a>
+
 # universal-storyboard-skill
 
-通用故事板设计与生成技能。它的默认目标不是轻量分镜板，而是**完整预制作导演板**：把结构化表单和参考素材转成可直接用于提案、导演沟通和生图执行的电影级视觉规划板。
+这是一个偏导演工作流的故事板 skill。它不是只给你几张灵感图，而是把表单输入、故事信息和参考素材整理成一张完整的预制作导演板，先输出可审阅的 Markdown 提示词，再在你确认后进入生图。
 
-## 当前定位
+## 它适合做什么
 
-- 全中文
-- 单次表单直入
-- 强素材锁定
-- 强导演推断
-- 默认输出完整预制作导演板
-- 先产出 Markdown 提示词，用户点“确认生图”后再产出图片结果
+- 把零散的故事需求整理成完整故事板
+- 给导演、提案、客户沟通准备预制作视觉板
+- 在生成图片前先把故事结构、镜头区、角色区、场景区理顺
+- 让素材锁定和导演推断一起工作，而不是互相打架
 
-## 主链
+## 你会拿到什么
+
+- `cinematic_preproduction_board`
+- `clean_reference_board`
+- `master_prompt_markdown`
+- `awaiting_confirmation` 的确认式生图流程
+
+## 功能亮点
+
+- 先出可审阅提示词，再确认生图
+- 强素材锁定，适合多参考输入
+- 导演板结构完整，不是零散拼图
+- 适合提案、沟通和后续执行
+- 把导演推断显式落到结构化字段里
+
+## Installation / 安装
+
+如果你作为本地 skill 使用，可放进 Codex skills 目录：
+
+```bash
+$ cp -R "universal-storyboard-skill" ~/.codex/skills/universal-storyboard-skill
+```
+
+## Usage / 用法
+
+这个 skill 的使用方式：
+
+它默认分两步走：
+
+1. 先根据表单和素材生成完整导演板提示词
+2. 用户确认后，再正式出图
+
+这很适合对质量有要求、又不想一上来就浪费生成次数的场景。
+
+```text
+$ 请根据这些故事信息和参考素材先生成完整导演板提示词，确认后再出图。
+```
+
+## 最重要的定位
+
+它更像“导演的工作板生成器”，而不是“普通几格分镜图生成器”。
+
+## 输入重点
+
+输入契约在 [interface/input.json](./interface/input.json)。
+
+最重要的字段：
+
+- `story_request.story_framework`
+- `story_request.scene_description`
+- `story_request.performance_focus`
+- `story_request.relationship_dynamic`
+- `story_request.tone_keywords`
+- `story_request.production_context`
+- `optional_parameters.shot_count_hint`
+- `optional_parameters.board_density`
+- `optional_parameters.render_detail_level`
+- `optional_parameters.inference_tolerance`
+
+## 输出重点
+
+输出契约在 [interface/output.json](./interface/output.json)。
+
+核心字段：
+
+- `master_prompt_markdown`
+- `image_generation_status`
+- `confirmation_action`
+- `generated_image_url`
+
+默认第一轮只填 `Prompt 输出`，并把 `image_generation_status` 标记为 `awaiting_confirmation`。确认之后才继续出图。
+
+## 内部主链
 
 ```text
 表单输入
@@ -29,87 +107,80 @@ Markdown 提示词
 图片结果 / 结构化错误
 ```
 
-## 核心中间模型
+## 它最适合的场景
 
-- `storyboard_request`
-  - 用户目标、推断字段、关系、tone、制作语境
-- `asset_lock_map`
-  - 每个素材的职责、继承规则、导演锚点
-- `preproduction_board_plan`
-  - 概念区、角色区、场景区、blocking、shot list、灯光与声音、风险控制
+- 需要一张完整导演板，而不是几个随意参考图
+- 先做创意和结构确认，再生图
+- 角色、服装、风格、场景都有参考素材，需要锁得比较稳
+- 提案、客户汇报、导演沟通需要“像工作板”的结果
 
-## 默认输出
-
-### 1. `cinematic_preproduction_board`
-
-完整预制作导演板，至少包含：
-
-- 概念区
-- 角色参考区
-- 场景与美术区
-- 顶视机位阻挡区
-- shot list 主区
-- 灯光 / 摄影 / 色彩 / 声音 / mood 区
-
-### 2. `clean_reference_board`
-
-纯图像参考板，用于下游视觉模型：
-
-- 无标题
-- 无说明框
-- 无参数栏
-- 只保留图像叙事
-
-## 输入契约
-
-见 [interface/input.json](/Users/griffith/Desktop/AI/skills/universal-storyboard-skill/interface/input.json)
-
-最重要的输入字段：
-
-- `story_request.story_framework`
-- `story_request.scene_description`
-- `story_request.performance_focus`
-- `story_request.relationship_dynamic`
-- `story_request.tone_keywords`
-- `story_request.production_context`
-- `optional_parameters.shot_count_hint`
-- `optional_parameters.board_density`
-- `optional_parameters.render_detail_level`
-- `optional_parameters.inference_tolerance`
-
-## 输出契约
-
-见 [interface/output.json](/Users/griffith/Desktop/AI/skills/universal-storyboard-skill/interface/output.json)
-
-核心输出字段：
-
-- `master_prompt_markdown`
-- `image_generation_status`
-- `confirmation_action`
-- `generated_image_url`
-
-默认首轮输出表单只填充 `Prompt 输出`，并将 `image_generation_status` 标记为 `awaiting_confirmation`。
-用户点输出表单里的“确认生图”后，才填充 `故事板图片输出`，返回 `generated_image_url` 或 `image_error`。
-
-内部能力主产物：
+## 核心中间结果
 
 - `storyboard_request`
 - `asset_lock_map`
 - `preproduction_board_plan`
 
-## 关键脚本
+这三个结果决定最后导演板长什么样，也决定为什么它比“直接拼 prompt 出图”更稳。
 
-- [run_storyboard_pipeline.py](/Users/griffith/Desktop/AI/skills/universal-storyboard-skill/skill/scripts/run_storyboard_pipeline.py)
-- [classify_asset_roles.py](/Users/griffith/Desktop/AI/skills/universal-storyboard-skill/skill/scripts/classify_asset_roles.py)
-- [infer_story_fields.py](/Users/griffith/Desktop/AI/skills/universal-storyboard-skill/skill/scripts/infer_story_fields.py)
-- [plan_preproduction_board.py](/Users/griffith/Desktop/AI/skills/universal-storyboard-skill/skill/scripts/plan_preproduction_board.py)
-- [render_storyboard_output.py](/Users/griffith/Desktop/AI/skills/universal-storyboard-skill/skill/scripts/render_storyboard_output.py)
-- [smoke_test_pipeline.py](/Users/griffith/Desktop/AI/skills/universal-storyboard-skill/skill/scripts/smoke_test_pipeline.py)
+## 仓库里的关键文件
 
-## 设计原则
+- [skill/SKILL.md](./skill/SKILL.md)
+- [skill/workflow.md](./skill/workflow.md)
+- [skill/scripts/run_storyboard_pipeline.py](./skill/scripts/run_storyboard_pipeline.py)
+- [skill/scripts/classify_asset_roles.py](./skill/scripts/classify_asset_roles.py)
+- [skill/scripts/infer_story_fields.py](./skill/scripts/infer_story_fields.py)
+- [skill/scripts/plan_preproduction_board.py](./skill/scripts/plan_preproduction_board.py)
+- [skill/scripts/render_storyboard_output.py](./skill/scripts/render_storyboard_output.py)
+- [skill/scripts/smoke_test_pipeline.py](./skill/scripts/smoke_test_pipeline.py)
+
+## 设计上的硬规则
 
 - 核心故事是唯一必填叙事字段
-- 关系、tone、表演、场景允许强推断，但必须回写到 `inferred_fields`
-- 风格素材只影响质感，不污染内容物
-- 服装素材只锁服装，不继承模特身份
-- 输出必须像导演工作板，而不是几格普通分镜图
+- 关系、表演、tone、场景可以强推断，但必须回写到推断字段
+- 风格素材锁质感，不锁内容
+- 服装素材锁服装，不继承模特身份
+- 输出结果必须像预制作导演板，而不是普通分镜格子
+
+## 仓库结构
+
+```text
+.
+├── README.md
+├── interface/
+│   ├── input.json
+│   └── output.json
+├── optimized_system_prompt.md
+└── skill/
+    ├── SKILL.md
+    ├── assets/
+    ├── examples/
+    ├── references/
+    ├── scripts/
+    └── workflow.md
+```
+
+---
+
+<a id="english"></a>
+
+## English
+
+`universal-storyboard-skill` builds a full pre-production storyboard board instead of a loose inspiration sheet. It first produces reviewable markdown prompts, then waits for confirmation before image generation.
+
+## Best for
+
+- director boards
+- client proposals
+- structured visual planning
+- asset-locked storyboard generation
+
+## Main outputs
+
+- `cinematic_preproduction_board`
+- `clean_reference_board`
+- `master_prompt_markdown`
+- confirmation-based image generation flow
+
+## License / 许可
+
+仓库内如有单独许可文件，以仓库实际文件为准；当前 README 不额外重定义许可。

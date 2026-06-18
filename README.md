@@ -1,186 +1,166 @@
-<p align="right">
-  <strong>语言 / Language:</strong>
-  <a href="#中文">中文</a> ·
-  <a href="#english">English</a>
-</p>
+# Universal Storyboard Skill | 通用导演故事板
 
-<a id="中文"></a>
+中文 | [English](#english)
 
-# universal-storyboard-skill
+`Universal Storyboard Skill` 是一个偏导演工作流的故事板 skill。不是只给你几张灵感图，而是把你直接发送的故事需求和参考素材整理成一张完整的预制作导演板——先输出可审阅的 Markdown 提示词，再在你确认后进入生图。
 
-这是一个偏导演工作流的故事板 skill。它不是只给你几张灵感图，而是把表单输入、故事信息和参考素材整理成一张完整的预制作导演板，先输出可审阅的 Markdown 提示词，再在你确认后进入生图。
+## 适合搜索的关键词
 
-## 它适合做什么
+storyboard, director board, pre-production board, cinematic storyboard, storyboard skill, 故事板, 导演板, 预制作板, AI storyboard, visual planning, shot list, blocking, 分镜设计, 视觉效果板, director-level storyboard, asset-locked storyboard.
 
-- 把零散的故事需求整理成完整故事板
-- 给导演、提案、客户沟通准备预制作视觉板
-- 在生成图片前先把故事结构、镜头区、角色区、场景区理顺
-- 让素材锁定和导演推断一起工作，而不是互相打架
+## 这个 Skill 能做什么
 
-## 你会拿到什么
+- 把零散故事需求整理成完整的预制作导演板。
+- 先出可审阅提示词，你确认后再生图——不走"一上来就浪费生成次数"的流程。
+- 强素材锁定：风格素材锁质感不锁内容、服装素材锁服装不继承模特身份。
+- 导演推断明确落在结果里：核心故事是唯一必填字段，其余强推断并回写。
+- 产出 `cinematic_preproduction_board` 或 `clean_reference_board`。
 
-- `cinematic_preproduction_board`
-- `clean_reference_board`
-- `master_prompt_markdown`
-- `awaiting_confirmation` 的确认式生图流程
+## 为什么不是普通分镜工具
 
-## 功能亮点
+普通分镜工具往往"直接拼 prompt 出图"。这个 skill：
 
-- 先出可审阅提示词，再确认生图
-- 强素材锁定，适合多参考输入
-- 导演板结构完整，不是零散拼图
-- 适合提案、沟通和后续执行
-- 把导演推断显式落到结构化字段里
+- 素材锁定 + 导演推断先跑完，再写最终提示词。
+- 内部必须形成三个中间对象（`storyboard_request`、`asset_lock_map`、`preproduction_board_plan`）才允许写出最终输出。
+- 先 Markdown 审阅、后确认生图，适合提案、沟通和有质量要求的场景。
 
-## Installation / 安装
+## 支持的场景
 
-如果你作为本地 skill 使用，可放进 Codex skills 目录：
+- 导演提案板
+- 客户汇报视觉板
+- 角色、服装、场景都有参考素材的锁定型故事板
+- 需要"像工作板"结果的导演沟通
+- 先做创意和结构确认、再生图的工作流
+
+## 安装
 
 ```bash
-$ cp -R "universal-storyboard-skill" ~/.codex/skills/universal-storyboard-skill
+npx skills add susu177990-rgb/universal-gpt-image-2-storyboard-skill
 ```
 
-## Usage / 用法
+Fork 版本：
 
-这个 skill 的使用方式：
+```bash
+npx skills add <YOUR_GITHUB_USERNAME>/universal-storyboard-skill
+```
 
-它默认分两步走：
+## 使用示例
 
-1. 先根据表单和素材生成完整导演板提示词
-2. 用户确认后，再正式出图
-
-这很适合对质量有要求、又不想一上来就浪费生成次数的场景。
+### 标准两步流程
 
 ```text
-$ 请根据这些故事信息和参考素材先生成完整导演板提示词，确认后再出图。
+/start
+[发送故事需求和参考素材]
+/board
+[审阅提示词]
+/image
 ```
 
-## 最重要的定位
+### 只想重整提示词
 
-它更像“导演的工作板生成器”，而不是“普通几格分镜图生成器”。
+```text
+/prompt
+```
 
-## 输入重点
+## 常用命令
 
-输入契约在 [interface/input.json](./interface/input.json)。
-
-最重要的字段：
-
-- `story_request.story_framework`
-- `story_request.scene_description`
-- `story_request.performance_focus`
-- `story_request.relationship_dynamic`
-- `story_request.tone_keywords`
-- `story_request.production_context`
-- `optional_parameters.shot_count_hint`
-- `optional_parameters.board_density`
-- `optional_parameters.render_detail_level`
-- `optional_parameters.inference_tolerance`
-
-## 输出重点
-
-输出契约在 [interface/output.json](./interface/output.json)。
-
-核心字段：
-
-- `master_prompt_markdown`
-- `image_generation_status`
-- `confirmation_action`
-- `generated_image_url`
-
-默认第一轮只填 `Prompt 输出`，并把 `image_generation_status` 标记为 `awaiting_confirmation`。确认之后才继续出图。
+| 命令 | 作用 |
+|---|---|
+| `/start` | 介绍两步用法、输入要求和结果形态 |
+| `/board` | 生成完整导演板 Markdown 提示词 |
+| `/prompt` | 只输出或重整导演板提示词文本 |
+| `/image` | 在已有提示词基础上执行确认生图 |
+| `/help` | 查看帮助 |
 
 ## 内部主链
 
 ```text
-表单输入
-  ->
+用户发送需求和素材
+  →
 素材锁定与导演锚点提取
-  ->
+  →
 故事字段强推断
-  ->
+  →
 preproduction_board_plan
-  ->
+  →
 Markdown 提示词
-  ->
+  →
 等待确认生图
-  ->
-图片结果 / 结构化错误
+  →
+图片结果 / 明确错误信息
 ```
-
-## 它最适合的场景
-
-- 需要一张完整导演板，而不是几个随意参考图
-- 先做创意和结构确认，再生图
-- 角色、服装、风格、场景都有参考素材，需要锁得比较稳
-- 提案、客户汇报、导演沟通需要“像工作板”的结果
 
 ## 核心中间结果
 
-- `storyboard_request`
-- `asset_lock_map`
-- `preproduction_board_plan`
+- `storyboard_request`：用户目标与输入约束的标准化结果
+- `asset_lock_map`：每个素材负责什么、禁止继承什么
+- `preproduction_board_plan`：完整导演板结构、shot list、blocking、lighting 与风险控制
 
-这三个结果决定最后导演板长什么样，也决定为什么它比“直接拼 prompt 出图”更稳。
+这三个结果决定最后导演板长什么样，也决定为什么它比"直接拼 prompt 出图"更稳。
 
-## 仓库里的关键文件
+## 项目结构
 
-- [skill/SKILL.md](./skill/SKILL.md)
-- [skill/workflow.md](./skill/workflow.md)
-- [skill/scripts/run_storyboard_pipeline.py](./skill/scripts/run_storyboard_pipeline.py)
-- [skill/scripts/classify_asset_roles.py](./skill/scripts/classify_asset_roles.py)
-- [skill/scripts/infer_story_fields.py](./skill/scripts/infer_story_fields.py)
-- [skill/scripts/plan_preproduction_board.py](./skill/scripts/plan_preproduction_board.py)
-- [skill/scripts/render_storyboard_output.py](./skill/scripts/render_storyboard_output.py)
-- [skill/scripts/smoke_test_pipeline.py](./skill/scripts/smoke_test_pipeline.py)
+```text
+universal-storyboard-skill/
+├── SKILL.md
+├── README.md
+├── optimized_system_prompt.md
+├── workflow.md
+├── assets/
+├── examples/
+├── references/
+└── scripts/
+```
 
 ## 设计上的硬规则
 
-- 核心故事是唯一必填叙事字段
-- 关系、表演、tone、场景可以强推断，但必须回写到推断字段
-- 风格素材锁质感，不锁内容
-- 服装素材锁服装，不继承模特身份
-- 输出结果必须像预制作导演板，而不是普通分镜格子
-
-## 仓库结构
-
-```text
-.
-├── README.md
-├── interface/
-│   ├── input.json
-│   └── output.json
-├── optimized_system_prompt.md
-└── skill/
-    ├── SKILL.md
-    ├── assets/
-    ├── examples/
-    ├── references/
-    ├── scripts/
-    └── workflow.md
-```
+- 核心故事是唯一必填叙事字段。
+- 关系、表演、tone、场景可以强推断，但必须回写到推断字段。
+- 风格素材锁质感，不锁内容。
+- 服装素材锁服装，不继承模特身份。
+- 输出结果必须像预制作导演板，而不是普通分镜格子。
+- 首轮必须先输出完整提示词；只有用户确认后才继续生图。
 
 ---
 
-<a id="english"></a>
-
 ## English
 
-`universal-storyboard-skill` builds a full pre-production storyboard board instead of a loose inspiration sheet. It first produces reviewable markdown prompts, then waits for confirmation before image generation.
+`Universal Storyboard Skill` builds a full pre-production director board instead of a loose inspiration sheet. It first produces reviewable markdown prompts, then waits for confirmation before image generation.
 
-## Best for
+## Search Keywords
 
-- director boards
-- client proposals
-- structured visual planning
-- asset-locked storyboard generation
+storyboard, director board, pre-production board, cinematic storyboard, AI storyboard, visual planning, shot list, blocking, asset-locked storyboard, 故事板, 导演板, 预制作板.
 
-## Main outputs
+## What It Does
 
-- `cinematic_preproduction_board`
-- `clean_reference_board`
-- `master_prompt_markdown`
-- confirmation-based image generation flow
+- Turns scattered story requirements into a complete pre-production board.
+- Two-step flow: review markdown prompts first, then generate images on confirmation.
+- Strong asset locking: style refs lock look, costume refs lock costume, neither inherits source identity.
+- Director inference is explicit: story is the only required field; the rest is strongly inferred and written back.
+- Outputs `cinematic_preproduction_board` or `clean_reference_board`.
+
+## Install
+
+```bash
+npx skills add susu177990-rgb/universal-gpt-image-2-storyboard-skill
+```
+
+For forks:
+
+```bash
+npx skills add <YOUR_GITHUB_USERNAME>/universal-storyboard-skill
+```
+
+## Fast Path
+
+```text
+/start -> send story/assets -> /board -> review -> /image
+```
+
+## Core Rule
+
+The output must look like a pre-production director board, not a loose storyboard grid. Asset locking and director inference come before final prompt writing.
 
 ## License / 许可
 
-仓库内如有单独许可文件，以仓库实际文件为准；当前 README 不额外重定义许可。
+仓库内如有单独许可文件，以仓库实际文件为准。
